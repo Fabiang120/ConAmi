@@ -1,46 +1,69 @@
 Backend (FastAPI)
 
-Requirements
+CCreate the virtual environment
 
-Python 3.9 or higher
-pip
+From the backend directory:
 
-
-
-Check Python:
-
-python3 --version
+python -m venv .venv
 
 
-Setup
+This creates a virtual environment inside .venv.
 
-Navigate to the backend directory:
-cd backend
+Activate the virtual environment
 
-Create a virtual environment:
-python3 -m venv venv
+Windows PowerShell
 
-Activate it:
+.venv\Scripts\Activate.ps1
+
+
 macOS / Linux
-source venv/bin/activate
 
-Windows
-venv\Scripts\activate
+source .venv/bin/activate
 
 
-Install dependencies:
-pip install fastapi uvicorn
+You should see (.venv) in your terminal prompt.
+
+Check the virtual environment is active (optional)
+
+Windows PowerShell
+
+(Get-Command python).Source
 
 
-Run the server
-python3 -m uvicorn main:app --reload
+If it points to .venv\Scripts\python, it worked.
+
+Upgrade pip (recommended)
+python -m pip install --upgrade pip
 
 
-The API will be available at:
+If pip is missing:
 
-http://127.0.0.1:8000
+python -m ensurepip --upgrade
+
+Install packages
+
+Install FastAPI using the standard setup:
+
+pip install "fastapi[standard]"
 
 
-Interactive API documentation:
+Or, if you have a requirements file:
 
-http://127.0.0.1:8000/docs
+pip install -r requirements.txt
+
+Then you can run the backend with fastapi dev main.py
+
+Deactivate the virtual environment (when done)
+deactivate
+
+
+Interactive API docs¶
+Now go to http://127.0.0.1:8000/docs.
+
+You will see the automatic interactive API documentation (provided by Swagger UI):
+
+
+Alternative API docs¶
+And now, go to http://127.0.0.1:8000/redoc.
+
+You will see the alternative automatic documentation (provided by ReDoc):
