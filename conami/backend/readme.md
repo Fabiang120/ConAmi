@@ -67,3 +67,80 @@ Alternative API docs¶
 And now, go to http://127.0.0.1:8000/redoc.
 
 You will see the alternative automatic documentation (provided by ReDoc):
+
+
+
+🪟 Windows
+
+Download PostgreSQL from:
+https://www.postgresql.org/download/windows/
+
+Choose Interactive Installer by EDB
+
+Run the installer 
+
+During installation:
+
+Set a password for the postgres superuser
+
+Keep the port set to 5432
+
+Finish the installation
+
+Verify installation
+
+Open PowerShell and run:
+
+psql --version
+
+
+If psql is not found, add the following to your PATH and restart PowerShell:
+
+C:\Program Files\PostgreSQL\16\bin
+
+🍎 macOS
+Using Homebrew (recommended)
+brew install postgresql@16
+brew services start postgresql@16
+
+Or using the official installer
+
+Download from:
+https://www.postgresql.org/download/macosx/
+
+Install PostgreSQL
+
+Set the postgres password
+
+Keep the port set to 5432
+
+Verify installation
+psql --version
+
+
+FOR ALL WINDOWS AND MAC
+
+Database Initialization (one-time)
+
+From the backend/ directory, run:
+
+psql -U postgres -f scripts/init_db.sql
+
+
+This script:
+
+creates the application database user
+
+creates the database
+
+grants the required permissions
+
+You only need to run this once per machine.
+
+Verify the database
+psql -U conami_user -d conami_db
+
+
+Exit with:
+
+\q
