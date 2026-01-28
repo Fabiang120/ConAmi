@@ -1,3 +1,4 @@
+import Link from "next/link";
 export default function Sidebar(){
     return (
         <div className="transition-all duration-300 min-h-screen w-56"  style={{backgroundColor: '#8D4F3F'}} >
@@ -6,7 +7,7 @@ export default function Sidebar(){
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 12.47c2.392 0 4.331-1.896 4.331-4.235C16.331 5.896 14.391 4 12 4 9.608 4 7.669 5.896 7.669 8.235c0 2.34 1.94 4.236 4.331 4.236Zm0 0c-4.8 0-6.617 2.597-7.298 4.74-.183.579-.275.868-.132 1.392.1.369.505.906.835 1.109.47.289.911.289 1.794.289h9.602c.883 0 1.324 0 1.794-.29.33-.202.735-.74.835-1.108.143-.524.051-.813-.133-1.391-.68-2.144-2.496-4.74-7.297-4.74Z"/>
                     </svg>
-                        Profile
+                        <Link href="/Profile" className="underline text-[#C37050] cursor-pointer">Profile</Link>
                     </a>
                     <a href="#" className="flex items-center gap-2 text-[#C37050] hover:text-white"> 
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
