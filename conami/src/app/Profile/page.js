@@ -1,5 +1,5 @@
 "use client";
-function Profile(){
+export default function Profile(){
     return(
         <h1>Create your profile</h1>
     )
