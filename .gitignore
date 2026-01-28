@@ -28,3 +28,6 @@ Thumbs.db
 
 # misc
 *.log
+
+# python
+*.venv
