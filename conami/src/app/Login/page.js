@@ -15,7 +15,7 @@ export default function Login (){
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await fetch("http://localhost:8000/users/",{
+        const res = await fetch(`http://localhost:8000/auth/login`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -28,8 +28,7 @@ export default function Login (){
         }
         const data = await res.json();
         console.log(data);
-        
-         router.push("/Home");
+        router.push("/Home");
     };
 
     return(

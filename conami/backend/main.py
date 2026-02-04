@@ -1,11 +1,12 @@
 import os
 from typing import Annotated
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 # fastapi dev main.py
 # .venv\Scripts\Activate.ps1
-
+#Verify the database
+# psql -U conami_user -d conami_db
 app = FastAPI()
 
 origins = [
@@ -40,6 +41,20 @@ def create_user(user: User ,session: SessionDep) -> User:
     session.commit()
     session.refresh(user)
     return user
+
+@app.post("/auth/login")
+def login(
+    session: SessionDep,
+    username: str = Body(...),
+    password: str = Body(...)
+):
+    user = session.get(User, username)
+
+    if not user or user.password != password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return {"message": "Login successful"}
+
 
 @app.get("/users/")
 def get_users(session: SessionDep) -> list[User]:
