@@ -1,6 +1,19 @@
 Backend (FastAPI)
 
-CCreate the virtual environment
+For Fast Activation with everything installed and created below (Run Sequentially)
+Backend folder
+.venv\Scripts\Activate.ps1
+fastapi dev main.py
+Verify the database
+psql -U conami_user -d conami_db
+
+In conami folder
+pnpm run dev
+
+
+Installation Process Below 
+
+Create the virtual environment
 
 From the backend directory:
 
@@ -70,7 +83,7 @@ You will see the alternative automatic documentation (provided by ReDoc):
 
 
 
-🪟 Windows
+Windows
 
 Download PostgreSQL from:
 https://www.postgresql.org/download/windows/
@@ -98,7 +111,7 @@ If psql is not found, add the following to your PATH and restart PowerShell:
 
 C:\Program Files\PostgreSQL\16\bin
 
-🍎 macOS
+macOS
 Using Homebrew (recommended)
 brew install postgresql@16
 brew services start postgresql@16
@@ -144,3 +157,30 @@ psql -U conami_user -d conami_db
 Exit with:
 
 \q
+
+Alembic Installation
+Pip install alembic
+alembic init alembic inside backend folder
+open alembic.ini and set
+sqlalchemy.url = postgresql+psycopg://conami_user:spanishrocks1234@localhost:5432/conami_db
+
+4) Connect Alembic to SQLModel
+
+Open alembic/env.py
+
+target_metadata = None
+
+replace with
+
+from main import SQLModel
+target_metadata = SQLModel.metadata
+
+After any model changes run below
+alembic revision --autogenerate -m "initial schema"
+
+Check the generated file in:
+
+alembic/versions/
+
+7) Apply the migration
+alembic upgrade head
