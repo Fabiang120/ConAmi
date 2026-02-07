@@ -6,10 +6,7 @@ If you do not have pnpm installed
 npm install -g pnpm 
 
 
-First, run the development server: 
-pnpm run dev 
-inside the conami folder **** NOT your computer root directory
-
+First, run the development server: pnpm dev inside the conami folder **** NOT your computer root directory
 If this doesnt work you must do pnpm install 
 
 
