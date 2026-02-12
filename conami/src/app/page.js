@@ -7,7 +7,7 @@ export default function MainApp() {
   return (
     <>
       <FrontPage />
-      <Login />
+      {/* <Login /> */}
     </>
   );
 }
