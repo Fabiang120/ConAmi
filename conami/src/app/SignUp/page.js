@@ -30,43 +30,58 @@ export default function SignUp() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-[#63372c]">
-            <div className="flex w-180 h-120 shadow-lg rounded-lg flex-col items-center p-8 bg-[#f0e1d1]">
-                <h1 className="font-bold text-black m-5">CREATE A PROFILE</h1>
+        <div className="flex items-center justify-center min-h-screen bg-[#f0e1d1]">
+            <div className="flex w-full max-w-md shadow-2xl rounded-2xl flex-col items-center p-10 bg-white">
+                <h1 className="text-3xl font-extrabold text-[#63372c] mb-8 tracking-tight">CREATE A PROFILE</h1>
 
-                <form onSubmit={handleSubmit} className=" flex flex-col gap-2 w-full max-w-sm items-center">
-                    <div className="flex flex-col  bg-[#f0e1d1] ">
-                        <label className="flex items-center gap-2 text-sm font-medium text-[#63372c]">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full text-[#63372c]">
+                    <div className="flex flex-col gap-2">
+                        <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
                             <FiUser size={20} />
                             Username
                         </label>
-                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="shadow-sm w-80 h-10 p-4 border " required />
+                        <input 
+                        type="text" 
+                        value={username} 
+                        onChange={(e) => setUsername(e.target.value)} 
+                        className="w-full h-12 px-4 rounded-lg bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium" 
+                        required />
                     </div>
 
-                    <div className="flex flex-col  bg-[#f0e1d1] ">
-                        <label className="flex items-center gap-2 text-sm font-medium text-[#63372c]">
+                    <div className="flex flex-col gap-2 ">
+                        <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
                             <FiKey size={20} />
                             Password
                         </label>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="shadow-sm w-80 h-10 p-4 border" required />
+                        <input 
+                        type="password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        className="w-full h-12 px-4 rounded-lg bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium" 
+                        required />
                     </div>
 
-                    <div className="flex flex-col bg-[#f0e1d1] ">
-                        <label className="flex items-center gap-2 text-sm font-medium text-[#63372c]">
+                    <div className="flex flex-col gap-2">
+                        <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider">
                             <FiLock size={20} />
                             Confirm Password
                         </label>
-                        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="shadow-sm w-80 h-10 p-4 border" required />
+                        <input 
+                        type="password" 
+                        value={confirmPassword} 
+                        onChange={(e) => setConfirmPassword(e.target.value)} 
+                        className="w-full h-12 px-4 rounded-lg bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium" 
+                        required />
                     </div>
 
-                    <button type="submit" className="w-80 h-10 bg-[#63372c] text-[#f0e1d1] rounded-full m-5 hover:scale-110 hover:ease-in-out hover:duration-300 transition-all">
+                    <button type="submit" className="bg-[#63372c] text-[#f0e1d1] w-full h-12 rounded-full mt-4 font-bold text-lg shadow-md transition-all transform hover:-translate-y-1">
                         <Link href="/Profile">Sign Up</Link>
                     </button>
                 </form>
 
                 <div className="flex gap-2 mt-4 text-sm m-10">
                     <p>Already have an account?</p>
-                    <Link href="/Login" className="underline text-[#63372c] cursor-pointer">Log In</Link>
+                    <Link href="/Login" className="font-bold text-[#63372c] underline decoration-2 underline-offset-4 hover:text-[#8d4f3f]">Log In</Link>
                 </div>
             </div>
         </div>

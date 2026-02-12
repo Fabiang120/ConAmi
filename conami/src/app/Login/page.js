@@ -63,13 +63,14 @@ export default function Login() {
                             required
                         />
                     </div>
+                    <Link href="/Home">
                     <button
                         type="submit"
                         disabled={!isFormValid}
-                        className={`w-full h-12 rounded-full mt-4 font-bold text-lg shadow-md transition-all transform hover:-translate-y-1 ${isFormValid ? "bg-[#63372c] text-[#f0e1d1] hover:shadow-lg" : "bg-[#ded0c1] text-[#b0a095] cursor-not-allowed"}`}
+                        className={`w-full h-12 rounded-full mt-4 font-bold text-lg shadow-md transition-all transform hover:-translate-y-1 ${isFormValid ? "bg-[#63372c] text-[#f0e1d1] hover:shadow-lg cursor-pointer" : "bg-[#ded0c1] text-[#b0a095] cursor-not-allowed"}`}
                     >
                         Login
-                    </button>
+                    </button></Link>
                 </form>
 
                 <div className="flex gap-2 mt-8 text-sm font-medium text-[#63372c]/80">
