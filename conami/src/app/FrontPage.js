@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Logo from "./Components/Logo";
+import Link from "next/link";
 
 export default function FrontPage() {
     return (
         <div className="grid min-h-screen lg:grid-cols-2 bg-[#f0e1d1]">
             <div className="absolute top-8 left-8">
-                <Logo />
+                <Logo width={60} height={60}/>
             </div>
             {/* Image Section - Left */}
             <div className="order-2 lg:order-1 col-span-1 flex items-center justify-center p-8 md:p-12 lg:pl-16 lg:pr-12 lg:pt-30">
@@ -35,13 +36,14 @@ export default function FrontPage() {
                 </p>
             </div>
             <div className="order-3 lg:col-span-2 flex flex-col gap-6 md:gap-10 md:flex-row md:justify-center items-center lg:-mt-20">
-                <button className="w-72 bg-[#63372c] text-[#f0e1d1] text-xl py-5 rounded-2xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
+                <Link href="/Login" >
+                <button className="cursor-pointer w-72 bg-[#63372c] text-[#f0e1d1] text-xl py-5 rounded-2xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
                     Sign in to ConAmi
-                </button>
-
-                <button className="w-72 border-2 border-[#63372c] text-[#63372c] text-xl py-5 rounded-2xl font-bold hover:shadow-lg transition-all transform hover:-translate-y-1">
-                    Create your ConAmi Profile
-                </button>
+                </button></Link>
+                 <Link href="/SignUp">
+                <button className="cursor-pointer w-72 border-2 border-[#63372c] text-[#63372c] text-xl py-5 rounded-2xl font-bold hover:shadow-lg transition-all transform hover:-translate-y-1">
+                   Create your ConAmi Profile 
+                </button></Link>
             </div >
         </div >
     );
