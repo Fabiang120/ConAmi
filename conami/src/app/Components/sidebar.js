@@ -9,7 +9,11 @@ export default function Sidebar() {
             style={{ backgroundColor: "#8D4F3F" }}
         >
             <nav className="p-4 space-y-2 text-white">
+                <Link 
+                href= "/Home">
                 <Logo/>
+                </Link>
+                
                 <Link
                     href="/Profile"
                     className="flex items-center gap-2 text-[#C37050] hover:text-white"
