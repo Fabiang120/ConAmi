@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Login() {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
+    const [error, setError] = React.useState("");
     const isFormValid = username.trim() !== "" && password.trim() !== "";
     const router = useRouter();
 
@@ -20,9 +21,10 @@ export default function Login() {
             body: JSON.stringify({ username, password })
         });
         if (!res.ok) {
-            alert("Login failed");
+            setError("Username or Password incorrect")
             return;
         }
+        setError("");
         const data = await res.json();
         console.log(data);
         router.push("/Home");
@@ -65,8 +67,6 @@ export default function Login() {
                             required
                         />
                     </div>
-
-                    <Link href="/Home">
                         <button
                             type="submit"
                             disabled={!isFormValid}
@@ -77,10 +77,14 @@ export default function Login() {
                         >
                             Login
                         </button>
-                    </Link>
-
+                    <div className="min-h-4.5 text-center">
+                        {error && (
+                            <p className="text-red-500 font-medium">
+                                {error}
+                            </p>
+                        )}
+                    </div>
                 </form>
-
                 <div className="flex gap-2 mt-8 font-medium text-[#63372c]/80 text-sm">
                     <p>Don't have an account?</p>
                     <Link href="/SignUp" className="font-bold text-[#63372c] underline decoration-2 underline-offset-4 hover:text-[#8d4f3f]">
