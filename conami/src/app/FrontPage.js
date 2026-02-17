@@ -32,14 +32,14 @@ export default function FrontPage() {
                 </p>
             </div>
 
-            <div className="order-3 lg:col-span-2 flex flex-col gap-6 md:gap-10 md:flex-row md:justify-center items-center lg:-mt-20">
+            <div className="order-3 lg:col-span-2 flex flex-col gap-6 md:gap-10 md:flex-row md:justify-center items-center lg:items-baseline mb-9 lg-mb-0">
                 <Link href="/Login">
                     <button className="cursor-pointer leading-normal w-72 bg-[#63372c] text-[#f0e1d1] text-lg py-3 rounded-md font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">
                         Sign in to ConAmi
                     </button>
                 </Link>
                 <Link href="/SignUp">
-                    <button className="cursor-pointer leading-normal w-72 border-2 border-[#63372c] text-[#63372c] text-lg py-3 rounded-md font-bold hover:shadow-lg transition-all transform hover:-translate-y-1 mb-9 lg-mb-0">
+                    <button className="cursor-pointer leading-normal w-72 border-2 border-[#63372c] text-[#63372c] text-lg py-3 rounded-md font-bold hover:shadow-lg transition-all transform hover:-translate-y-1">
                         Create your ConAmi Profile
                     </button>
                 </Link>

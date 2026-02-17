@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlalchemy.exc import IntegrityError
 # fastapi dev main.py
 # .venv\Scripts\Activate.ps1
 #Verify the database
@@ -34,14 +35,19 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
-
+# SIGN UP ENDPOINT
 @app.post("/users/")
 def create_user(user: User ,session: SessionDep) -> User:
     session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
+    try:
+        session.commit()
+        session.refresh(user)
+        return user
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Username already exists")
 
+# LOGIN ENDPOINT
 @app.post("/auth/login")
 def login(
     session: SessionDep,
