@@ -14,7 +14,7 @@ export default function Profile(){
     <div className="flex h-screen  overflow-hidden">
         <Sidebar/>
         <div className="flex-1 min-h-screen items-center justify-center font-sans bg-[#f0e1d1]">
-            <h1 className="text-3xl py-4 font-semibold mb-6 justify-center items-center flex">
+            <h1 className="text-3xl py-4 font-semibold mb-6 justify-center items-center leading-tight tracking-tight flex">
                 Create your profile
             </h1>
             <div className="w-full max-w-5xl mx-auto space-y-8">

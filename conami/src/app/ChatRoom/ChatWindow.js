@@ -56,7 +56,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
             {activeChat.messages.map((msg, index) => (
               <div 
               key={`${activeChat.id}-${msg.id}-${index}`}
-              className={`max-w-xs px-4 py-2 rounded-2xl text-md ${
+              className={`max-w-xs px-4 py-2 rounded-xl text-md ${
                 msg.username === "You"
                 ? "self-end bg-white text-[#63372c]"
                 : "self-start bg-white text-[#63372c]"}`}>

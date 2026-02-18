@@ -10,7 +10,7 @@ export default function ChatList({chats, setActiveChatId, activeChatId}) {
                 key={chat.id}
                 onClick={() => setActiveChatId(chat.id)}
                 className={`
-                    p-4 rounded-2xl mb-3 cursor-pointer border-transparent
+                    p-4 mb-3 cursor-pointer border-transparent
                     ${isActive 
                         ? "bg-[#f0e1d1] text-[#63372c] shadow" 
                         : "bg-white text-[#63372c] "}
