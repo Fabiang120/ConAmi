@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import Sidebar from '../Components/sidebar.js'
+import { FiSend } from "react-icons/fi";
+import React, { useEffect, useState, useRef } from "react";
 
 export default function Profile(){
     const [username, setUsername] = useState("");
@@ -9,12 +11,13 @@ export default function Profile(){
     const [gender, setGender] = useState("");
 
     return(
+    <div className="flex h-screen  overflow-hidden">
+        <Sidebar/>
         <div className="flex-1 min-h-screen items-center justify-center font-sans bg-[#f0e1d1]">
             <h1 className="text-3xl py-4 font-semibold mb-6 justify-center items-center flex">
                 Create your profile
             </h1>
             <div className="w-full max-w-5xl mx-auto space-y-8">
-
                 <div className="flex gap-6 justify-center">
                     <input
                         type="text"
@@ -86,8 +89,15 @@ export default function Profile(){
                         <option value="male">Male</option>
                         <option value="other">Other</option>
                         </select>
+                        
+                </div>
+                <div className = "flex justify-center">
+                    <button className="px-5 py-3 bg-[#63372c] text-white rounded-lg hover:bg-[#4a2a20] focus:outline-none focus:ring-2 focus:ring-[#63372c]">
+                        Save Profile
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
     )
 }
