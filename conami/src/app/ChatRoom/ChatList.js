@@ -1,6 +1,6 @@
 export default function ChatList({chats, setActiveChatId, activeChatId}) {
     return (
-        <div className="w-70 h-full  overflow-y-auto ">
+        <div className="h-full overflow-y-auto ">
             <h1 className="text-2xl font-bold p-6">Messages</h1>
             {chats.map(chat=> {
                 const lastMes = chat.messages[chat.messages.length-1]

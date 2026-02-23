@@ -1,13 +1,11 @@
 export default function Logo() {
     return (
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-2 mb-6 w-full overflow-hidden">
             <svg
-                width="60"
-                height="60"
                 viewBox="0 0 100 100"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-[#63372c]"
+                className="w-10 h-auto text-[#63372c] flex-shrink-0"
             >
                 {/* Person 1 (Left) */}
                 <circle cx="25" cy="25" r="8" fill="currentColor" />
@@ -111,7 +109,7 @@ export default function Logo() {
                 />
 
             </svg>
-            <span className="text-3xl font-bold font-sans tracking-tight text-[#63372c]">
+            <span className="text-2xl font-bold font-sans tracking-tight text-[#63372c] whitespace-nowrap">
                 ConAmi
             </span>
         </div>
