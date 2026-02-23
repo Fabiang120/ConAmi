@@ -5,13 +5,12 @@ import Logo from "./Logo";
 export default function Sidebar() {
     return (
         <div
-            className="transition-all duration-300 min-h-screen w-56"
+            className="transition-all duration-300 min-h-full"
             style={{ backgroundColor: "#8D4F3F" }}
         >
             <nav className="p-4 space-y-2 text-white">
-                <Link 
-                href= "/Home">
-                <Logo/>
+                <Link href="/Home">
+                    <Logo />
                 </Link>
                 
                 <Link
@@ -30,10 +29,13 @@ export default function Sidebar() {
                     Chats
                 </Link>
 
-                <a className="flex items-center gap-2 text-[#C37050] hover:text-white cursor-pointer">
+                <Link
+                    href="/Settings"
+                    className="flex items-center gap-2 text-[#C37050] hover:text-white"
+                >
                     <FiSettings size={24} />
                     Settings
-                </a>
+                </Link>
 
             </nav>
         </div>

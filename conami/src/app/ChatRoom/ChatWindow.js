@@ -35,13 +35,13 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
 
   if(!activeChat){
     return (
-      <div className="flex-1 flex items-center justify-center bg-white shadow-lg">
+      <div className="h-full flex items-center justify-center bg-white shadow-lg">
         <p className="text-gray-400 text-xl"> Select a chat to start messaging</p>
       </div>
     )
   }
   return (
-        <div className="flex flex-col h-screen w-223 bg-[#f0e1d1] shadow-lg">
+        <div className="flex flex-col h-full bg-[#f0e1d1] shadow-lg">
           {/* GroupName */}
 
           <div className='p-4 flex items-center gap-3 bg-white'>
