@@ -6,7 +6,7 @@ export default function FrontPage() {
     return (
         <div className="relative grid min-h-screen lg:grid-cols-2 bg-[#f0e1d1]">
             <div className="absolute top-8 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0">
-                <Logo width={60} height={60} />
+                <Logo className="text-3xl" />
             </div>
 
             <div className="order-2 lg:order-1 col-span-1 flex items-center justify-center p-2 pb-8 lg:pl-16 lg:pr-12 lg:pt-30">
