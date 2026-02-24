@@ -1,11 +1,11 @@
-export default function Logo() {
+export default function Logo({ className = "" }) {
     return (
-        <div className="flex items-center gap-2 mb-6 w-full overflow-hidden">
+        <div className={`flex items-center gap-2 ${className}`}>
             <svg
                 viewBox="0 0 100 100"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-10 h-auto text-[#63372c] flex-shrink-0"
+                className="h-[2em] w-auto text-[#63372c] flex-shrink-0"
             >
                 {/* Person 1 (Left) */}
                 <circle cx="25" cy="25" r="8" fill="currentColor" />
@@ -109,7 +109,7 @@ export default function Logo() {
                 />
 
             </svg>
-            <span className="text-2xl font-bold font-sans tracking-tight text-[#63372c] whitespace-nowrap">
+            <span className="font-bold font-sans tracking-tight text-[#63372c] whitespace-nowrap">
                 ConAmi
             </span>
         </div>
