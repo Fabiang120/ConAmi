@@ -12,13 +12,13 @@ export const mockMessages = [
       {
         mid: 2,
         username: "You",
-        content: "I'm building the chat UI ",
+        content: "I'm good. Going to my local coffe shop. ",
         timestamp: "10:31 AM",
       },
       {
         mid: 3,
         username: "Sarah",
-        content: "It looks good already!",
+        content: "Yummy! What coffee did you get?",
         timestamp: "10:32 AM",
       },
     ],
@@ -30,13 +30,13 @@ export const mockMessages = [
       {
         mid: 1,
         username: "Michael",
-        content: "Did you finish the project?",
+        content: "Como fue la clase de baile ayer?",
         timestamp: "Yesterday",
       },
       {
         mid: 2,
         username: "You",
-        content: "Almost done!",
+        content: "Super!",
         timestamp: "Yesterday",
       },
     ],

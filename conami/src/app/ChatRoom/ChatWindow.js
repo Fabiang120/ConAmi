@@ -13,7 +13,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
       username: "You",
       content: input,
       timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
+        hour: "numeric",
         minute: "2-digit",
       }),
     };
