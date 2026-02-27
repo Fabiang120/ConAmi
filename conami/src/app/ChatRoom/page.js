@@ -12,29 +12,31 @@ export default function ChatRoom() {
   
     const activeChat = chats.find(chat => chat.id === activeChatId);
   return (
-    <div className="grid grid-cols-12 min-h-screen">
-
+    <div className="flex min-h-screen">
       {/* Sidebar */}
-      <div className="col-span-12 md:col-span-3 lg:col-span-2">
-        <Sidebar />
-      </div>
+      <Sidebar />
+      
+      {/* Chat Area */}
+      <div className="flex-1 grid grid-cols-12">
 
-      {/* Chat List */}
-      <div className="col-span-12 md:col-span-3 lg:col-span-3">
-        <ChatList
-          chats={chats}
-          setActiveChatId={setActiveChatId}
-          activeChatId={activeChatId}
-        />
-      </div>
+        {/* Chat List */}
+        <div className="col-span-4 lg:col-span-3 border-r">
+          <ChatList
+            chats={chats}
+            setActiveChatId={setActiveChatId}
+            activeChatId={activeChatId}
+          />
+        </div>
 
-      {/* Chat Window */}
-      <div className="col-span-12 md:col-span-6 lg:col-span-7">
-        <ChatWindow
-          activeChat={activeChat}
-          setChats={setChats}
-          setActiveChatId={setActiveChatId}
-        />
+        {/* Chat Window */}
+        <div className="col-span-8 lg:col-span-9">
+          <ChatWindow
+            activeChat={activeChat}
+            setChats={setChats}
+            setActiveChatId={setActiveChatId}
+          />
+        </div>
+
       </div>
     </div>
   );
