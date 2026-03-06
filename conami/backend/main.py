@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 # fastapi dev main.py
 # .venv\Scripts\Activate.ps1
@@ -23,6 +24,19 @@ allow_headers=["*"],
 class User(SQLModel, table=True):
     username: str = Field(primary_key=True)
     password: str = Field(index=True)
+
+class Conversations(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    user1: str = Field(foreign_key="user.username")
+    user2: str = Field(foreign_key="user.username")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class Message(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    conversation_id: int = Field(foreign_key="conversations.id")
+    sender_username: str = Field(foreign_key="user.username")
+    content: str = Field()
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 database_url = "postgresql+psycopg://conami_user:spanishrocks1234@localhost:5432/conami_db"
 
@@ -67,6 +81,6 @@ def get_users(session: SessionDep) -> list[User]:
     users = session.exec(select(User)).all()
     return users
 
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+# CHAT ENDPOINT
+@app.post("/chat")
+def get_chat
