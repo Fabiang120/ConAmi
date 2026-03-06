@@ -5,7 +5,7 @@ export default function Logo({ className = "" }) {
                 viewBox="0 0 100 100"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-[2em] w-auto text-[#63372c] flex-shrink-0"
+                className="h-[2em] w-auto flex-shrink-0"
             >
                 {/* Person 1 (Left) */}
                 <circle cx="25" cy="25" r="8" fill="currentColor" />
@@ -41,7 +41,6 @@ export default function Logo({ className = "" }) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
-
                 {/* Person 2 (Right) */}
                 <circle cx="75" cy="25" r="8" fill="currentColor" />
                 <path
@@ -76,10 +75,7 @@ export default function Logo({ className = "" }) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
-
-                {/* 
-                    The Distinguisher / Separator Line 
-                */}
+                {/* The Distinguisher / Separator Line */}
                 <path
                     d="M 50 32 Q 52 22 49 12"
                     stroke="var(--background)"
@@ -87,7 +83,6 @@ export default function Logo({ className = "" }) {
                     strokeLinecap="round"
                     style={{ fill: 'none' }}
                 />
-
                 {/* High Five Sparks */}
                 <path
                     d="M 50 8 L 50 0"
@@ -107,9 +102,8 @@ export default function Logo({ className = "" }) {
                     strokeWidth="3"
                     strokeLinecap="round"
                 />
-
             </svg>
-            <span className="font-bold font-sans tracking-tight text-[#63372c] whitespace-nowrap">
+            <span className="font-bold font-sans tracking-tight whitespace-nowrap">
                 ConAmi
             </span>
         </div>

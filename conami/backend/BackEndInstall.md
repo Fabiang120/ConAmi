@@ -2,13 +2,14 @@ Backend
 KEEP IN MIND ON MACOS python commands might run instead with python3 -m venv .venv for example
 
 (EVERYTHING INSTALLED FAST START MACOS)
+cd backend
 source .venv/bin/activate
 fastapi dev main.py
 Verify the database
 psql -U conami_user -d conami_db
 
 (EVERYTHING INSTALLED FAST START WINDOWS)
-Backend folder
+cd backend
 .venv\Scripts\Activate.ps1
 fastapi dev main.py
 Verify the database

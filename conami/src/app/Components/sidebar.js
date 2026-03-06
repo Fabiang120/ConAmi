@@ -4,39 +4,40 @@ import Logo from "./Logo";
 
 export default function Sidebar() {
     return (
-        <div
-            className="transition-all duration-300 min-h-full"
-            style={{ backgroundColor: "#8D4F3F" }}
-        >
-            <nav className="p-4 space-y-2 text-white">
-                <Link href="/Home">
-                    <Logo />
+        <div className="transition-all duration-300 min-h-full bg-[#63372c]">
+            <nav className="p-6 space-y-6 overflow-hidden">
+                <Link href="/Home" className="block mb-8">
+                    <Logo className="text-[#f0e1d1] text-2xl" />
                 </Link>
-                
-                <Link
-                    href="/Profile"
-                    className="flex items-center gap-2 text-[#C37050] hover:text-white"
-                >
-                    <FiUser size={24} />
-                    <span className="cursor-pointer">Profile</span>
-                </Link>
-
-                <Link
-                    href="/ChatRoom"
-                    className="flex items-center gap-2 text-[#C37050] hover:text-white"
-                    >
-                    <FiMessageSquare size={24} />
-                    Chats
-                </Link>
-
-                <Link
-                    href="/Settings"
-                    className="flex items-center gap-2 text-[#C37050] hover:text-white"
-                >
-                    <FiSettings size={24} />
-                    Settings
-                </Link>
-
+                <ul className="space-y-6">
+                    <li>
+                        <Link
+                            href="/Profile"
+                            className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
+                        >
+                            <FiUser size={26} />
+                            Profile
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            href="/ChatRoom"
+                            className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
+                        >
+                            <FiMessageSquare size={26} />
+                            Chats
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            href="/Settings"
+                            className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
+                        >
+                            <FiSettings size={26} />
+                            Settings
+                        </Link>
+                    </li>
+                </ul>
             </nav>
         </div>
     );
