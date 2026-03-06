@@ -1,6 +1,12 @@
 Backend
 KEEP IN MIND ON MACOS python commands might run instead with python3 -m venv .venv for example
 
+(EVERYTHING INSTALLED FAST START MACOS)
+source .venv/bin/activate
+fastapi dev main.py
+Verify the database
+psql -U conami_user -d conami_db
+
 (EVERYTHING INSTALLED FAST START WINDOWS)
 Backend folder
 .venv\Scripts\Activate.ps1
@@ -16,7 +22,7 @@ Create the virtual environment - From the backend directory:
 
 This creates a virtual environment inside .venv - Activate the virtual environment
 
-Windows PowerShell
+WINDOWS
 2) .venv\Scripts\Activate.ps1
 
 macOS / Linux
@@ -106,11 +112,5 @@ Below it should be
 from main import SQLModel
 target_metadata = SQLModel.metadata
 
-After any database table changes in the code in backend run below
-alembic revision --autogenerate -m "initial schema"
-
-Check the generated file in:
-alembic/versions/
-
-Apply the migration
+WHENEVER YOU ADD NEW TABLES TO DATABSE RUN THIS
 alembic upgrade head
