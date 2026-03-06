@@ -1,11 +1,13 @@
 "use client";
+import BottomNav from "../Components/BottomNav.js";
 import Sidebar from "../Components/sidebar.js"
+
 import { MdAdminPanelSettings } from "react-icons/md";
 
 export default function Settings(){
     return(
         <div className ="grid grid-cols-12 min-h-screen">
-            <div className="col-span-12 md:col-span-3 lg:col-span-2">
+            <div className="hidden md:block md:col-span-3 lg:col-span-2">
                 <Sidebar />
             </div>
             <div className="col-span-12 md:col-span-9 lg:col-span-10 bg-[#f0e1d1] font-sans px-20">
@@ -29,7 +31,7 @@ export default function Settings(){
                 </ul>
                 <div className="h-px bg-[#63372c]" />
             </div>
-            
+            <BottomNav/>
         </div>
     )
 }
