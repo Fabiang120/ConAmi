@@ -71,11 +71,16 @@ Install PostgreSQL
 7) Set a password for the postgres superuser - remember this
 8) Keep the port set to 5432, keep all settings default
 
-Verify installation
+Verify installation 
+9) For some reason on mac postgresql doesnt add to path
+9) Run ls /Library/PostgreSQL to find your installed PostgreSQL version
+9) Then confirm the bin directory with ls /Library/PostgreSQL/<version>/bin
+9) echo 'export PATH="/Library/PostgreSQL/<version>/bin:$PATH"'
+9) restart terminal and do psql --version
 9) psql --version
 
 
-FOR ALL WINDOWS AND MAC
+FOR ALL WINDOWS AND MAC in backend directory
 Database Initialization (one-time) 
 10) psql -U postgres -f scripts/init_db.sql
 
@@ -101,7 +106,7 @@ Below it should be
 from main import SQLModel
 target_metadata = SQLModel.metadata
 
-After any database table changes in backend run below
+After any database table changes in the code in backend run below
 alembic revision --autogenerate -m "initial schema"
 
 Check the generated file in:
