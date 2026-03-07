@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FiUser, FiMessageSquare, FiSettings } from "react-icons/fi";
+import { LuFilePenLine } from "react-icons/lu";
 import Logo from "./Logo";
 
 export default function Sidebar() {
@@ -35,6 +36,15 @@ export default function Sidebar() {
                         >
                             <FiSettings size={26} />
                             Settings
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            href="/Self-Evaluation"
+                            className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
+                        >
+                            <LuFilePenLine size={26} />
+                            Self-Evaluation
                         </Link>
                     </li>
                 </ul>
