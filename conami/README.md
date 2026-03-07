@@ -3,7 +3,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Getting Started
 
 If you do not have pnpm installed
-npm install -g pnpm 
+npm install -g pnpm
 
 
 First, run the development server: pnpm dev inside the conami folder **** NOT your computer root directory
