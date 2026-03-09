@@ -1,10 +1,15 @@
 import os
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query, Body
+from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from datetime import datetime
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
 from sqlalchemy.exc import IntegrityError
+from dotenv import load_dotenv
+
 # fastapi dev main.py
 # .venv\Scripts\Activate.ps1
 #Verify the database
@@ -20,6 +25,17 @@ allow_origins=origins,
 allow_methods=["*"],
 allow_headers=["*"],
 )
+
+#pwd_context handles bcrypt hashing, gives function to hash password on sign up
+# also gives function to verify password when logging in 
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+load_dotenv()
+# THIS TAKES THE SECRET KEY FROM .ENV TO SIGN JWT TOKENS
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 class User(SQLModel, table=True):
     username: str = Field(primary_key=True)
@@ -38,29 +54,53 @@ class Message(SQLModel, table=True):
     content: str = Field()
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-database_url = "postgresql+psycopg://conami_user:spanishrocks1234@localhost:5432/conami_db"
 
+database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url)
 
+
+# with creates session with database url puts that into session and then gets called but pauses due to yield session
+# We use yield here instead of return to maintain session open for methods when they call this
 def get_session():
     with Session(engine) as session:
         yield session
 
-
 SessionDep = Annotated[Session, Depends(get_session)]
+
+# Creates JWT access token with secret key called by Login and SignUp
+def create_access_token(username: str):
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    data = {"sub": username, "exp": expire}
+    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
 # SIGN UP ENDPOINT
 @app.post("/users/")
-def create_user(user: User ,session: SessionDep) -> User:
+def create_user(user: User ,session: SessionDep) -> dict:
+    user.password = pwd_context.hash(user.password)
     session.add(user)
     try:
         session.commit()
         session.refresh(user)
-        return user
+        token = create_access_token(user.username)
+        return {"access_token": token, "token_type": "bearer"}
     except IntegrityError:
         session.rollback()
         raise HTTPException(status_code=400, detail="Username already exists")
 
+# This function decodes JWT, extracts username from sub, and returns full user object 
+@app.get("/auth/me")
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep) -> dict:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    user = session.get(User, username)
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    return {"username" : user.username}
 
 @app.get("/users/")
 def get_users(session: SessionDep) -> list[User]:
@@ -68,19 +108,14 @@ def get_users(session: SessionDep) -> list[User]:
     return users
 
 
-# LOGIN ENDPOINT
-@app.post("/auth/login")
-def login(
-    session: SessionDep,
-    username: str = Body(...),
-    password: str = Body(...)
-    ):
-    user = session.get(User, username)
-
-    if not user or user.password != password:
+# LOGIN ENDPOINT AND CALLS CREATE TOKEN
+@app.post("/token")
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep) -> dict:
+    user = session.get(User, form_data.username)
+    if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    return {"message": "Login successful"}
+    token = create_access_token(user.username)
+    return {"access_token": token, "token_type": "bearer"}
 
 # Create Conversations
 @app.post("/conversations")
@@ -88,7 +123,7 @@ def create_conversation(
     session: SessionDep, 
     user1: str = Body(...), 
     user2: str = Body(...)
-    ):
+    ) -> Conversations:
 
     new_conversation = Conversations(user1=user1, user2=user2)
     session.add(new_conversation)
@@ -98,7 +133,7 @@ def create_conversation(
 
 # GET ALL CONVERSATIONS FOR A USER
 @app.get("/conversations")
-def get_conversations(session: SessionDep, username: str = Query(...)):
+def get_conversations(session: SessionDep, username: str = Query(...)) -> list[Conversations]:
     conversations = session.exec(select(Conversations).where(
         (Conversations.user1 ==username) | (Conversations.user2 == username)
         )
@@ -107,7 +142,7 @@ def get_conversations(session: SessionDep, username: str = Query(...)):
 
 # GET ALL MESSAGES IN A CONVERSATION
 @app.get("/conversations/{conversation_id}/messages")
-def get_messages(conversation_id : int, session: SessionDep):
+def get_messages(conversation_id : int, session: SessionDep) -> list[Message]:
     messages = session.exec(select(Message).where(Message.conversation_id == conversation_id)
     ).all()
     return messages
@@ -119,7 +154,7 @@ def send_message(
     session: SessionDep,
     sender_username: str= Body(...),
     content: str = Body(...)
-    ):
+    ) -> Message:
     new_message = Message(conversation_id=conversation_id, sender_username=sender_username, content=content)
     session.add(new_message)
     session.commit()
