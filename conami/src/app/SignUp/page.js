@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { FiUser, FiKey, FiLock } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Components/AuthContext";
 
 export default function SignUp() {
     const [username, setUsername] = React.useState("");
@@ -10,6 +11,7 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = React.useState("");
     const [error, setError] = React.useState("");
     const router = useRouter();
+    const {login} = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,6 +19,7 @@ export default function SignUp() {
             alert("Passwords do not match");
             return;
         }
+        // First signs in user by checking password / username
         const res = await fetch("http://localhost:8000/users/", {
             method: "POST",
             headers: {
@@ -29,7 +32,7 @@ export default function SignUp() {
             return;
         }
         const data = await res.json();
-        console.log(data);
+        login(data.access_token, username);
         router.push("/Home");
     };
 

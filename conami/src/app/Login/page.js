@@ -3,6 +3,7 @@ import React from "react"
 import Link from "next/link";
 import { FiUser, FiKey } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Components/AuthContext";
 
 export default function Login() {
     const [username, setUsername] = React.useState("");
@@ -10,15 +11,20 @@ export default function Login() {
     const [error, setError] = React.useState("");
     const isFormValid = username.trim() !== "" && password.trim() !== "";
     const router = useRouter();
+    const {login} = useAuth();
 
+    // logins in user and creates token
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await fetch(`http://localhost:8000/auth/login`, {
+        const formData = new URLSearchParams();
+        formData.append("username", username);
+        formData.append("password", password);
+        const res = await fetch(`http://localhost:8000/token`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: JSON.stringify({ username, password })
+            body: formData.toString()
         });
         if (!res.ok) {
             setError("Username or Password incorrect")
@@ -26,7 +32,7 @@ export default function Login() {
         }
         setError("");
         const data = await res.json();
-        console.log(data);
+        login(data.access_token, username);
         router.push("/Home");
     };
 
