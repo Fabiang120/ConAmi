@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FiUser, FiMessageSquare, FiSettings } from "react-icons/fi";
 import { LuFilePenLine } from "react-icons/lu";
+import { FaFileContract } from "react-icons/fa"; //also temporary for the terms and services, but I will change it later. I just want it to look nice for now
 import Logo from "./Logo";
 
 export default function Sidebar() {
@@ -45,6 +46,16 @@ export default function Sidebar() {
                         >
                             <LuFilePenLine size={26} />
                             Self-Evaluation
+                        </Link>
+                    </li>
+                    {/*This is not supposed to be in the navbar, but I have it here for debugging. I am creating the terms and services for the log in.*/}
+                    <li>
+                        <Link
+                            href="/TermsAndServices"
+                            className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
+                        >
+                            <FaFileContract size={26} />
+                            Terms and Services
                         </Link>
                     </li>
                 </ul>
