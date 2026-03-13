@@ -9,6 +9,8 @@ export default function Profile() {
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
     const [gender, setGender] = useState("");
+    const [LanguageSpoken, setLanguageSpoken] = useState("");
+    
     return (
         <div className="grid grid-cols-12 min-h-screen">
             <div className="hidden md:block md:col-span-3 lg:col-span-2">
@@ -34,6 +36,15 @@ export default function Profile() {
                             onChange={(e) => setEmail(e.target.value)}
                             className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
                         />
+                        <select
+                            value={LanguageSpoken}
+                            onChange={(e) => setLanguageSpoken(e.target.value)}
+                            className="w-1/3 px-4 py-3 rounded-lg border border-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#63372c]"
+                        >
+                            <option value="">Language you are Fluent in?</option>
+                            <option value="english">English</option>
+                            <option value="spanish">Spanish</option>
+                        </select>
                     </div>
                     <div className="flex gap-6 justify-center">
                         <select
