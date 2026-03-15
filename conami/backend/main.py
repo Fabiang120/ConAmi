@@ -125,14 +125,23 @@ def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: S
     return {"access_token": token, "token_type": "bearer"}
 
 # Create Conversations
+# This also prevents conversations dupes by alphabetizes users and checking if user1 is already in conversations table
 @app.post("/conversations")
 def create_conversation(
     session: SessionDep, 
     user1: str = Body(...), 
     user2: str = Body(...)
     ) -> Conversations:
-
-    new_conversation = Conversations(user1=user1, user2=user2)
+    if user1 < user2:
+        alphabetized_user1 = user1
+        alphabetized_user2 = user2
+    else:
+        alphabetized_user1 = user2
+        alphabetized_user2 = user1
+    conversation_exists = session.exec(select(Conversations).where(Conversations.user1 == alphabetized_user1)).first()
+    if(conversation_exists):
+        return conversation_exists
+    new_conversation = Conversations(user1=alphabetized_user1,user2=alphabetized_user2)    
     session.add(new_conversation)
     session.commit()
     session.refresh(new_conversation)
@@ -174,7 +183,7 @@ def send_message(
 @app.get("/conversations/full")
 def get_conversations_with_messages(
     session: SessionDep, 
-    username: str = Query(...)) -> list[ConversationsWithMessages]:
+    username: str = Query(...)) -> list[ConversationWithMessages]:
     conversations = session.exec(select(Conversations).where(
         (Conversations.user1 ==username) | (Conversations.user2 == username)
         )
@@ -189,4 +198,4 @@ def get_conversations_with_messages(
             created_at = conversation.created_at,
             messages = messages_
         ))
-        return result
+    return result
