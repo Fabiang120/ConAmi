@@ -10,6 +10,7 @@ import { useAuth } from "../Components/AuthContext";
 export default function ChatRoom() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
+  const [Error, setError] = useState("");
   const activeChat = chats.find(chat => chat.id === activeChatId);
   const { token } = useAuth();
   const handleStart = async () => {
