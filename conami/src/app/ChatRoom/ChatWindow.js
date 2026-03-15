@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
   const [input, setInput] =useState("");
   const messagesEnd = useRef(null);
-
   const handleSend = () => {
     if(!input.trim()) return;
 
