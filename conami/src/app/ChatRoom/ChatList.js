@@ -1,30 +1,7 @@
 import React from "react"
-import { useAuth } from "../Components/AuthContext";
+
 
 export default function ChatList({chats, setActiveChatId, activeChatId}) {
-    const [username, setUsername] = React.useState("");
-    const [error, setError] = React.useState("");
-    const { token } = useAuth();
-    const handleStart = async () => {
-        const res = await fetch(`http://localhost:8000/auth/me`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-        if(!res.ok){
-            setError("Failed to authenticate user");
-            return;
-        }
-        const data = await res.json();
-        const res2 = await fetch(`http://localhost:8000/conversations?username=${data.username}`, {
-            method: "GET"
-        });
-        if(!res2.ok){
-            setError("Failed to get conversatinos for user");
-            return;
-        }
-    }
     return (
         <div className="h-full overflow-y-auto ">
             <h1 className="text-2xl font-bold p-6">Messages</h1>
@@ -48,7 +25,7 @@ export default function ChatList({chats, setActiveChatId, activeChatId}) {
                             {chat.name}
                         </h2>
                     <span className="text-xs text-[#874B3D]">
-                        {lastMes?.timestamp}
+                        {lastMes?.created_at}
                     </span>
                 </div>
                 </div>

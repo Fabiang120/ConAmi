@@ -54,6 +54,13 @@ class Message(SQLModel, table=True):
     content: str = Field()
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# This is not a sql table it just combines conversations with their messages
+class ConversationWithMessages(SQLModel):
+    id: int
+    user1: str
+    user2: str
+    created_at: datetime
+    messages: list[Message]
 
 database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url)
@@ -131,7 +138,8 @@ def create_conversation(
     session.refresh(new_conversation)
     return new_conversation
 
-# GET ALL CONVERSATIONS FOR A USER
+# GET ALL CONVERSATIONS FOR A USER 
+# MIGHT GET RID OF !!!!
 @app.get("/conversations")
 def get_conversations(session: SessionDep, username: str = Query(...)) -> list[Conversations]:
     conversations = session.exec(select(Conversations).where(
@@ -161,3 +169,24 @@ def send_message(
     session.refresh(new_message)
     return new_message
     # we put the conversation id, sender-username and content all in the message table
+
+# Will return conversation with messages list by querying results and messages
+@app.get("/conversations/full")
+def get_conversations_with_messages(
+    session: SessionDep, 
+    username: str = Query(...)) -> list[ConversationsWithMessages]:
+    conversations = session.exec(select(Conversations).where(
+        (Conversations.user1 ==username) | (Conversations.user2 == username)
+        )
+    ).all()
+    result = []
+    for conversation in conversations:
+        messages_ = session.exec(select(Message).where(Message.conversation_id == conversation.id)).all()
+        result.append(ConversationWithMessages(
+            id = conversation.id,
+            user1 = conversation.user1,
+            user2 = conversation.user2,
+            created_at = conversation.created_at,
+            messages = messages_
+        ))
+        return result
