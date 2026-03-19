@@ -1,9 +1,11 @@
-import { FiArrowLeftCircle, FiSend } from "react-icons/fi";
+import { FiArrowLeftCircle, FiSend, FiEdit } from "react-icons/fi";
 import React, { useEffect, useState, useRef } from "react";
+import Feedback from "./Feedback";
 
 export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
   const [input, setInput] =useState("");
   const messagesEnd = useRef(null);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const handleSend = () => {
     if(!input.trim()) return;
 
@@ -43,12 +45,19 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
         <div className="flex flex-col h-full bg-[#f0e1d1] shadow-lg">
           {/* GroupName */}
 
-          <div className='p-4 flex items-center gap-3 bg-white'>
+          <div className='p-4 flex items-center gap-3 bg-white justify-between'>
+            <div className="flex items-center gap-2">
             <button onClick={() => setActiveChatId(null)}>
               <FiArrowLeftCircle size={20} className=" cursor-pointer"/>
-            </button>
-            <h2 className="font-semibold">{activeChat.name}</h2>
+              </button>
+              <h2 className="font-semibold">{activeChat.name}</h2>
+             </div> 
+            <FiEdit className="text-xl cursor-pointer text-gray-500 hover:text-[#63372C] transition"
+            onClick={() => setIsFeedbackOpen(true)}/>
           </div>
+          {isFeedbackOpen && (
+            <Feedback onClose={() => setIsFeedbackOpen(false)}/>
+          )}
 
           {/* messages */}
           <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-3">
