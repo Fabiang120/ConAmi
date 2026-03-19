@@ -8,7 +8,7 @@ import ChatWindow from './ChatWindow';
 import ChatList from './ChatList';
 import { useAuth } from "../Components/AuthContext";
 export default function ChatRoom() {
-  const [chats, setChats] = useState([]);
+  const [chats, setChats] = useState([]);//CHNAGE BACK TO useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [Error, setError] = useState("");
   const activeChat = chats.find(chat => chat.id === activeChatId);

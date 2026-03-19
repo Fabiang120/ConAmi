@@ -5,10 +5,12 @@ export const mockProfiles = [
     email : "finn@gmail.com",
     fluent: "Spanish",
     practice: "English",
+    proficiency: "Intermediate",
     country: "Colombia",
     gender: "Male",
     age: 22 ,
-    rating: "No Reviews"
+    rating: "No Reviews",
+    bio: "Me gusta bailar salsa!"
 },
 {
     id: 2,
@@ -26,7 +28,7 @@ export const mockProfiles = [
     email : "uniuni@email.com",
     fluent: "English",
     practice: "Spanish",
-    country: "Puerto Rico",
+    country: "Puerto-Rico",
     gender: "Female",
     rating: "No Reviews"
 },
@@ -55,7 +57,7 @@ export const mockProfiles = [
     email : "link@gmail.com",
     fluent: "Spanish",
     practice: "English",
-    country: "El Salvador",
+    country: "El-Savador",
     rating: 3.5
 },
 ];
