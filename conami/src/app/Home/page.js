@@ -3,8 +3,9 @@ import Sidebar from '../Components/sidebar.js';
 import BottomNav from '../Components/BottomNav.js';
 import { mockProfiles } from '../Profile/mockProfiles.js';
 import {ProfileModal} from './ProfileModal.js';
-import { FiStar, FiUserCheck, FiUserPlus } from "react-icons/fi";
+import { FiStar, FiUserCheck, FiUserPlus, FiMessageSquare } from "react-icons/fi";
 import { useState } from "react";
+import { useRouter } from 'next/navigation.js';
 
 export default function Home() {
   const renderStars = (rating) => {
@@ -30,6 +31,8 @@ export default function Home() {
 
   //PROFILE SELECTION
   const [selectedProfile, setSelectedProfile] = useState(null);
+
+  const router = useRouter();
 
   return (
     <div className="flex min-h-screen">
@@ -89,10 +92,14 @@ export default function Home() {
           <span className="flex text-3xl mt-6 cursor-pointer "
           onClick={(e) => {
             e.stopPropagation();
-            handleAdded(profile.id)}}
+            // handleAdded(profile.id)
+            router.push(`/chat?user=${profile.username}`);
+            }}
           >
-          {addedUsers[profile.id] ? (<FiUserCheck/>) : (<FiUserPlus/>)}
+            <FiMessageSquare/>
+          {/* {addedUsers[profile.id] ? (<FiUserCheck/>) : (<FiUserPlus/>)} */}
           </span>
+
           </div>
         </div>
             ))}
