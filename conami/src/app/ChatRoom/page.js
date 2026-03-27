@@ -7,8 +7,10 @@ import { mockMessages } from './mockmessages.js';
 import ChatWindow from './ChatWindow';
 import ChatList from './ChatList';
 import { useAuth } from "../Components/AuthContext";
+import { useSearchParams } from 'next/navigation.js';
+
 export default function ChatRoom() {
-  const [chats, setChats] = useState([]);//CHNAGE BACK TO useState([]);
+  const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [Error, setError] = useState("");
   const activeChat = chats.find(chat => chat.id === activeChatId);
@@ -49,6 +51,18 @@ export default function ChatRoom() {
     handleStart();
   },[])
 
+  //From connection from home message button to chat
+  const searchParams = useSearchParams();
+  const targetUser = searchParams.get("user");
+  
+  useEffect (() => {
+      if(!target || chats.length === 0)
+          return;
+      const foundChat = chats.find(chat => chat.name === targetUser);
+      if(foundChat){
+          setActiveChatId(foundChat.id);
+      }
+  }, [targetUser, chats]);
 
   return (
     <div className="grid grid-cols-12 min-h-screen">

@@ -1,5 +1,10 @@
+import { FiMessageSquare } from "react-icons/fi";
+import { useRouter } from 'next/navigation.js';
+
 export function ProfileModal({ profile, onClose }) {
   if (!profile) return null;
+
+  const router = useRouter();
 
   return (
     <div 
@@ -42,6 +47,17 @@ export function ProfileModal({ profile, onClose }) {
             <p className="text-xs text-gray-400 tracking-wide">COUNTRY</p>
           </div>
         </div>
+        <div className="flex justify-center mt-6">
+          <span className="flex text-xl mt-6 p-3 text-white bg-[#63372C] rounded-2xl cursor-pointer transform transition-transform duration-200 hover:scale-110"
+            onClick={(e) => {
+              e.stopPropagation();
+            // handleAdded(profile.id)
+              router.push(`/chat?user=${profile.username}`);
+            }}
+          >
+            Start Chatting! <FiMessageSquare/>
+          </span>
+          </div>
       </div>
     </div>
   );
