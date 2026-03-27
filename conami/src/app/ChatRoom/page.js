@@ -56,7 +56,7 @@ export default function ChatRoom() {
   const targetUser = searchParams.get("user");
   
   useEffect (() => {
-      if(!target || chats.length === 0)
+      if(!targetUser || chats.length === 0)
           return;
       const foundChat = chats.find(chat => chat.name === targetUser);
       if(foundChat){
