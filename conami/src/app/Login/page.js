@@ -13,26 +13,19 @@ export default function Login() {
     const router = useRouter();
     const {login} = useAuth();
 
-    // logins in user and creates token
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new URLSearchParams();
         formData.append("username", username);
         formData.append("password", password);
-        const res = await fetch(`http://localhost:8000/token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: formData.toString()
-        });
-        if (!res.ok) {
-            setError("Username or Password incorrect")
+        const success = await login(formData);
+        if (!success) {
+            setError("Username or Password incorrect");
             return;
         }
+
         setError("");
-        const data = await res.json();
-        login(data.access_token, username);
         router.push("/Home");
     };
 

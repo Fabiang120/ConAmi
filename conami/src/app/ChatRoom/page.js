@@ -14,23 +14,13 @@ export default function ChatRoom() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [Error, setError] = useState("");
   const activeChat = chats.find(chat => chat.id === activeChatId);
-  const { token } = useAuth();
+  const { username, loading } = useAuth();
   const handleStart = async () => {
     // Sends token that all screens have as its created by either login or sign up 
     // Sends token to auth/me and gets the user's username
-    const res = await fetch(`http://localhost:8000/auth/me`, {
+    const res2 = await fetch(`http://localhost:8000/conversations/full`, {
       method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-    if (!res.ok) {
-      setError("Failed to authenticate user");
-      return;
-    }
-    const data = await res.json();
-    const res2 = await fetch(`http://localhost:8000/conversations/full?username=${data.username}`, {
-      method: "GET"
+      credentials: "include",
     });
     if (!res2.ok) {
       setError("Failed to get conversatinos for user");
@@ -42,14 +32,24 @@ export default function ChatRoom() {
     // Messages objects have message id, conversation id, sender username, content, created at for message
     const formattedchats = data2.map(conversation_message => ({
       id: conversation_message.id,
-      name: (conversation_message.user1 != data.username) ? conversation_message.user1 : conversation_message.user2,
-      messages: conversation_message.messages
+      name: (conversation_message.user1 != username) ? conversation_message.user1 : conversation_message.user2,
+      messages: conversation_message.messages.map(msg => ({
+        id:msg.id,
+        username: msg.sender_username,
+        content: msg.content,
+        timestamp: new Date(msg.created_at).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+        created_at: msg.created_at,
+      })),
     }));
     setChats(formattedchats);
   }
   useEffect(() => {
+    if (loading || !username) return;
     handleStart();
-  },[])
+  }, [username, loading])
 
   //From connection from home message button to chat
   const searchParams = useSearchParams();

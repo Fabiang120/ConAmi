@@ -1,6 +1,6 @@
 import os
 from typing import Annotated
-from fastapi import Depends, FastAPI, HTTPException, Query, Body
+from fastapi import Depends, FastAPI, HTTPException, Query, Body, Response, Cookie
 from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -20,10 +20,12 @@ origins = [
     "http://localhost:3000"
 ]
 
-app.add_middleware(CORSMiddleware,
-allow_origins=origins,
-allow_methods=["*"],
-allow_headers=["*"],
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 #pwd_context handles bcrypt hashing, gives function to hash password on sign up
@@ -74,40 +76,61 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
+def get_username_from_cookie(
+    access_token: Annotated[str | None, Cookie()] = None
+) -> str:
+    if access_token is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return username
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 # Creates JWT access token with secret key called by Login and SignUp
 def create_access_token(username: str):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     data = {"sub": username, "exp": expire}
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
-# SIGN UP ENDPOINT
+def set_auth_cookie(response: Response, username: str) -> None:
+    token = create_access_token(username)
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        path="/",
+    )
+
 @app.post("/users/")
-def create_user(user: User ,session: SessionDep) -> dict:
+def create_user(user: User, session: SessionDep, response: Response) -> dict:
     user.password = pwd_context.hash(user.password)
     session.add(user)
     try:
         session.commit()
         session.refresh(user)
-        token = create_access_token(user.username)
-        return {"access_token": token, "token_type": "bearer"}
+        set_auth_cookie(response, user.username)
+        return {"ok": True}
     except IntegrityError:
         session.rollback()
         raise HTTPException(status_code=400, detail="Username already exists")
 
 # This function decodes JWT, extracts username from sub, and returns full user object 
 @app.get("/auth/me")
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep) -> dict:
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    user = session.get(User, username)
+def get_current_user(
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+    user = session.get(User,username)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-    return {"username" : user.username}
+    return {"username": user.username}
 
 @app.get("/users/")
 def get_users(session: SessionDep) -> list[User]:
@@ -117,28 +140,39 @@ def get_users(session: SessionDep) -> list[User]:
 
 # LOGIN ENDPOINT AND CALLS CREATE TOKEN
 @app.post("/token")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep) -> dict:
+def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: SessionDep,
+    response: Response
+) -> dict:
     user = session.get(User, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_access_token(user.username)
-    return {"access_token": token, "token_type": "bearer"}
+
+    set_auth_cookie(response, user.username)
+    return {"ok": True}
 
 # Create Conversations
 # This also prevents conversations dupes by alphabetizes users and checking if user1 is already in conversations table
 @app.post("/conversations")
 def create_conversation(
     session: SessionDep, 
-    user1: str = Body(...), 
+    username: Annotated[str, Depends(get_username_from_cookie)],
     user2: str = Body(...)
     ) -> Conversations:
-    if user1 < user2:
-        alphabetized_user1 = user1
+    if username < user2:
+        alphabetized_user1 = username
         alphabetized_user2 = user2
     else:
         alphabetized_user1 = user2
-        alphabetized_user2 = user1
-    conversation_exists = session.exec(select(Conversations).where(Conversations.user1 == alphabetized_user1)).first()
+        alphabetized_user2 = username
+    
+    conversation_exists = session.exec(
+        select(Conversations).where(
+            (Conversations.user1 == alphabetized_user1) &
+            (Conversations.user2 == alphabetized_user2)
+        )
+    ).first()
     if(conversation_exists):
         return conversation_exists
     new_conversation = Conversations(user1=alphabetized_user1,user2=alphabetized_user2)    
@@ -169,10 +203,10 @@ def get_messages(conversation_id : int, session: SessionDep) -> list[Message]:
 def send_message(
     conversation_id : int, 
     session: SessionDep,
-    sender_username: str= Body(...),
+    username: Annotated[str, Depends(get_username_from_cookie)],
     content: str = Body(...)
     ) -> Message:
-    new_message = Message(conversation_id=conversation_id, sender_username=sender_username, content=content)
+    new_message = Message(conversation_id=conversation_id, sender_username=username, content=content)
     session.add(new_message)
     session.commit()
     session.refresh(new_message)
@@ -183,7 +217,7 @@ def send_message(
 @app.get("/conversations/full")
 def get_conversations_with_messages(
     session: SessionDep, 
-    username: str = Query(...)) -> list[ConversationWithMessages]:
+    username: Annotated[str,Depends(get_username_from_cookie)]) -> list[ConversationWithMessages]:
     conversations = session.exec(select(Conversations).where(
         (Conversations.user1 ==username) | (Conversations.user2 == username)
         )
