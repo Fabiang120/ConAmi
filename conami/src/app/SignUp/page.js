@@ -25,14 +25,16 @@ export default function SignUp() {
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify({ username, password })
         });
+
         if (!res.ok) {
             setError("Failed to create account. Username may already be taken.");
             return;
         }
-        const data = await res.json();
-        login(data.access_token, username);
+
+        await refreshUser();
         router.push("/Home");
     };
 

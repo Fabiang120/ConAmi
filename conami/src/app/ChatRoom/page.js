@@ -47,9 +47,9 @@ export default function ChatRoom() {
     setChats(formattedchats);
   }
   useEffect(() => {
-    if (loading || !username) return;
+    if (!username) return;
     handleStart();
-  }, [username, loading])
+  }, [username])
 
   //From connection from home message button to chat
   const searchParams = useSearchParams();
