@@ -33,7 +33,6 @@ export default function SignUp() {
             setError("Failed to create account. Username may already be taken.");
             return;
         }
-
         await refreshUser();
         router.push("/Home");
     };
@@ -56,6 +55,10 @@ export default function SignUp() {
                         <input
                             type="text"
                             value={username}
+                            minLength={8}
+                            maxLength={40}
+                            pattern="^[A-Za-z0-9_]+$"
+                            title="Username must be 8-40 characters and can only contain letters, numbers, and underscores"
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required
@@ -70,6 +73,10 @@ export default function SignUp() {
                         <input
                             type="password"
                             value={password}
+                            minLength ={8}
+                            maxLength={40}
+                            pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$"
+                            title="Must contain at least 1 uppercase letter, 1 number, and 1 special character"
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required
@@ -84,6 +91,10 @@ export default function SignUp() {
                         <input
                             type="password"
                             value={confirmPassword}
+                            minLength={8}
+                            maxLength={40}
+                            pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$"
+                            title="Must contain at least 1 uppercase letter, 1 number, and 1 special character"
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required

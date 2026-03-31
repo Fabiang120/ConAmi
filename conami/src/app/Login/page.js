@@ -47,6 +47,7 @@ export default function Login() {
                         <input
                             type="text"
                             value={username}
+                            maxLength={40}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required
@@ -61,6 +62,7 @@ export default function Login() {
                         <input
                             type="password"
                             value={password}
+                            maxLength={40}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required
