@@ -61,7 +61,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
 
           <div className='p-4 flex items-center gap-3 bg-white justify-between'>
             <div className="flex items-center gap-2">
-            <button onClick={() => setActiveChatId(null)}>
+              <button onClick={() => setActiveChatId(null)}>
               <FiArrowLeftCircle size={20} className=" cursor-pointer"/>
               </button>
               <h2 className="font-semibold">{activeChat.name}</h2>

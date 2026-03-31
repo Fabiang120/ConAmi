@@ -1,4 +1,6 @@
 import os
+import re
+from pydantic import BaseModel, Field as PydanticField
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query, Body, Response, Cookie
 from passlib.context import CryptContext
@@ -30,6 +32,8 @@ app.add_middleware(
 
 #pwd_context handles bcrypt hashing, gives function to hash password on sign up
 # also gives function to verify password when logging in 
+USERNAME_REGEX = re.compile(r"^[A-Za-z0-9_]{8,40}$")
+PASSWORD_REGEX = re.compile(r"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,40}$")
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -90,6 +94,18 @@ def get_username_from_cookie(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+def check_regexes(username: str, password:str):
+    if not USERNAME_REGEX.fullmatch(username):
+        raise HTTPException(
+            status_code=400,
+            detail="Username must be 8-40 characters and only contain letters, numbers and underscores"
+        )
+    if not PASSWORD_REGEX.fullmatch(password):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be 8-40 characters and include 1 uppercase letter, 1 number, and 1 special character"
+    )
+
 # Creates JWT access token with secret key called by Login and SignUp
 def create_access_token(username: str):
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -108,8 +124,10 @@ def set_auth_cookie(response: Response, username: str) -> None:
         path="/",
     )
 
+# SignUp API. route
 @app.post("/users/")
 def create_user(user: User, session: SessionDep, response: Response) -> dict:
+    check_regexes(user.username,user.password)
     user.password = pwd_context.hash(user.password)
     session.add(user)
     try:
@@ -133,9 +151,9 @@ def get_current_user(
     return {"username": user.username}
 
 @app.get("/users/")
-def get_users(session: SessionDep) -> list[User]:
-    users = session.exec(select(User)).all()
-    return users
+def get_users(session: SessionDep) -> list[str]:
+    usernames = session.exec(select(User.username)).all()
+    return usernames
 
 
 # LOGIN ENDPOINT AND CALLS CREATE TOKEN
@@ -145,6 +163,7 @@ def login(
     session: SessionDep,
     response: Response
 ) -> dict:
+    check_regexes(form_data.username,form_data.password)
     user = session.get(User, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
