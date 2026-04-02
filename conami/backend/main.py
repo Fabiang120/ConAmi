@@ -11,6 +11,10 @@ from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from sqlalchemy.exc import IntegrityError
 from dotenv import load_dotenv
+from fastapi import Request
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # fastapi dev main.py
 # .venv\Scripts\Activate.ps1
@@ -30,6 +34,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 #pwd_context handles bcrypt hashing, gives function to hash password on sign up
 # also gives function to verify password when logging in 
 USERNAME_REGEX = re.compile(r"^[A-Za-z0-9_]{8,40}$")
@@ -45,7 +52,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
 class User(SQLModel, table=True):
     username: str = Field(primary_key=True)
-    password: str = Field(index=True)
+    password: str
 
 class Conversations(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -104,7 +111,7 @@ def check_regexes(username: str, password:str):
         raise HTTPException(
             status_code=400,
             detail="Password must be 8-40 characters and include 1 uppercase letter, 1 number, and 1 special character"
-    )
+        )
 
 # Creates JWT access token with secret key called by Login and SignUp
 def create_access_token(username: str):
@@ -158,10 +165,12 @@ def get_users(session: SessionDep) -> list[str]:
 
 # LOGIN ENDPOINT AND CALLS CREATE TOKEN
 @app.post("/token")
+@limiter.limit("5/minute")
 def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: SessionDep,
-    response: Response
+    response: Response,
+    request: Request
 ) -> dict:
     check_regexes(form_data.username,form_data.password)
     user = session.get(User, form_data.username)
@@ -179,6 +188,10 @@ def create_conversation(
     username: Annotated[str, Depends(get_username_from_cookie)],
     user2: str = Body(...)
     ) -> Conversations:
+    if username == user2:
+        raise HTTPException(status_code=400, detail="Cannot create conversation with yourself")
+    if session.get(User, user2) is None:
+        raise HTTPException(status_code=404, detail="User2 not found")
     if username < user2:
         alphabetized_user1 = username
         alphabetized_user2 = user2
@@ -203,16 +216,23 @@ def create_conversation(
 # GET ALL CONVERSATIONS FOR A USER 
 # MIGHT GET RID OF !!!!
 @app.get("/conversations")
-def get_conversations(session: SessionDep, username: str = Query(...)) -> list[Conversations]:
+def get_conversations(session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]) -> list[Conversations]:
+    user1 = conversations.user1
+    user2 = conversations.user2
     conversations = session.exec(select(Conversations).where(
-        (Conversations.user1 ==username) | (Conversations.user2 == username)
+        (user1 ==username) | (user2 == username)
         )
     ).all()
     return conversations
 
 # GET ALL MESSAGES IN A CONVERSATION
 @app.get("/conversations/{conversation_id}/messages")
-def get_messages(conversation_id : int, session: SessionDep) -> list[Message]:
+def get_messages(conversation_id : int, session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]) -> list[Message]:
+    conversation = session.get(Conversations, conversation_id)
+    if conversation is None:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    if username != conversation.user1 and username != conversation.user2:
+        raise HTTPException(status_code=403, detail="Not a participant in this conversation")
     messages = session.exec(select(Message).where(Message.conversation_id == conversation_id)
     ).all()
     return messages
@@ -225,6 +245,11 @@ def send_message(
     username: Annotated[str, Depends(get_username_from_cookie)],
     content: str = Body(...)
     ) -> Message:
+    conversation = session.get(Conversations, conversation_id)
+    if conversation is None:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    if username != conversation.user1 and username != conversation.user2:
+        raise HTTPException(status_code=403, detail="Not a participant in this conversation")
     new_message = Message(conversation_id=conversation_id, sender_username=username, content=content)
     session.add(new_message)
     session.commit()

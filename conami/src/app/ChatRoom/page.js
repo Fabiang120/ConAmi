@@ -14,7 +14,7 @@ export default function ChatRoom() {
   const [activeChatId, setActiveChatId] = useState(null);
   const [Error, setError] = useState("");
   const activeChat = chats.find(chat => chat.id === activeChatId);
-  const { username, loading } = useAuth();
+  const { username} = useAuth();
   const handleStart = async () => {
     // Sends token that all screens have as its created by either login or sign up 
     // Sends token to auth/me and gets the user's username

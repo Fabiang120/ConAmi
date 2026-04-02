@@ -102,10 +102,6 @@ Verify the database
 Exit with:
 \q
 
-ALEMBIC RELATED THINGS
-12) open alembic.ini and check this is correct
-sqlalchemy.url = postgresql+psycopg://conami_user:spanishrocks1234@localhost:5432/conami_db
-
 Connect Alembic to SQLModel
 13) Open alembic/env.py make sure the below is correct
 target_metadata is commented out
