@@ -11,7 +11,7 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = React.useState("");
     const [error, setError] = React.useState("");
     const router = useRouter();
-    const {login} = useAuth();
+    const {refreshUser} = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
