@@ -25,7 +25,7 @@ export default function ChatList({chats, setActiveChatId, activeChatId}) {
                             {chat.name}
                         </h2>
                     <span className="text-xs text-[#874B3D]">
-                        {lastMes?.created_at}
+                                {lastMes?.timestamp}
                     </span>
                 </div>
                 </div>

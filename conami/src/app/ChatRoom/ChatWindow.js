@@ -1,19 +1,34 @@
 import { FiArrowLeftCircle, FiSend, FiEdit } from "react-icons/fi";
 import React, { useEffect, useState, useRef } from "react";
 import Feedback from "./Feedback";
+import {useAuth } from "../Components/AuthContext";
 
 export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
   const [input, setInput] =useState("");
+  const {username} = useAuth();
   const messagesEnd = useRef(null);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-  const handleSend = () => {
+  const handleSend = async () => {
     if(!input.trim()) return;
+    const contentToSend = input;
+    const res = await fetch(`http://localhost:8000/conversations/${activeChat.id}/messages`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(contentToSend),
+    });
+    if(!res.ok){
+      return;
+    }
+    const savedMessage = await res.json();
 
     const newMessage = {
-      id: Date.now(),
-      username: "You",
-      content: input,
-      timestamp: new Date().toLocaleTimeString([], {
+      id: savedMessage.id,
+      username: savedMessage.sender_username,
+      content: savedMessage.content,
+      timestamp: new Date(savedMessage.created_at).toLocaleTimeString([], {
         hour: "numeric",
         minute: "2-digit",
       }),
@@ -26,7 +41,6 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
         : chat
       )
     );
-
     setInput("");
   };
 
@@ -47,7 +61,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
 
           <div className='p-4 flex items-center gap-3 bg-white justify-between'>
             <div className="flex items-center gap-2">
-            <button onClick={() => setActiveChatId(null)}>
+              <button onClick={() => setActiveChatId(null)}>
               <FiArrowLeftCircle size={20} className=" cursor-pointer"/>
               </button>
               <h2 className="font-semibold">{activeChat.name}</h2>
@@ -65,7 +79,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
               <div 
               key={`${activeChat.id}-${msg.id}-${index}`}
               className={`max-w-xs px-4 py-2 rounded-xl text-md ${
-                msg.username === "You"
+                msg.username === username
                 ? "self-end bg-white text-[#63372c]"
                 : "self-start bg-white text-[#63372c]"}`}>
                   <p>{msg.content}</p>

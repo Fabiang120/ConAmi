@@ -13,26 +13,19 @@ export default function Login() {
     const router = useRouter();
     const {login} = useAuth();
 
-    // logins in user and creates token
+   
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new URLSearchParams();
         formData.append("username", username);
         formData.append("password", password);
-        const res = await fetch(`http://localhost:8000/token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: formData.toString()
-        });
-        if (!res.ok) {
-            setError("Username or Password incorrect")
+        const success = await login(formData);
+        if (!success) {
+            setError("Username or Password incorrect");
             return;
         }
+
         setError("");
-        const data = await res.json();
-        login(data.access_token, username);
         router.push("/Home");
     };
 
@@ -54,6 +47,7 @@ export default function Login() {
                         <input
                             type="text"
                             value={username}
+                            maxLength={40}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required
@@ -68,6 +62,7 @@ export default function Login() {
                         <input
                             type="password"
                             value={password}
+                            maxLength={40}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full h-12 px-4 rounded-md bg-[#f0e1d1]/30 border-2 border-[#63372c]/20 focus:border-[#63372c] focus:bg-white outline-none transition-all font-medium"
                             required

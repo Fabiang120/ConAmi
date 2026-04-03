@@ -33,48 +33,12 @@ export default function Feedback({ onClose}){
         <h2 className="text-xl font-semibold mb-4">
           Send Feedback
         </h2>
-        <div className="w-full max-w-5xl mx-auto space-y-8"> 
-            <AgreeScaleQuestion
-            question="My partner expressed themselves clearly:"
-            name="express"
-            value={answers.express}
-            onChange={handleChange}
-            />
-            <AgreeScaleQuestion
-            question="My partner’s fluency has improved:"
-            name="fluency"
-            value={answers.fluency}
-            onChange={handleChange}
-            />
-            <AgreeScaleQuestion
-            question="My partner seems more confident speaking in their learned language:"
-            name="confidence"
-            value={answers.confidence}
-            onChange={handleChange}
-            />
-            <AgreeScaleQuestion
-            question="Our conversation had a natural flow:"
-            name="flow"
-            value={answers.flow}
-            onChange={handleChange}
-            />
-        </div>
-        <p className="mt-6 text-lg">Area(s) I noticed my partner has improved in:</p>
+        <p className="mt-6 text-lg">Area(s) our dialogue can improve on:</p>
         <textarea
           placeholder="Write feedback..."
           className="w-full h-28 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#63372C]"
         />
         <p className="mt-4 text-lg">One strength I noticed in my partner:</p>
-        <textarea
-          placeholder="Write feedback..."
-          className="w-full h-28 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#63372C]"
-        />
-        <p className="mt-4 text-lg">Suggestion(s) for my partner:</p>
-        <textarea
-          placeholder="Write feedback..."
-          className="w-full h-28 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#63372C]"
-        />
-        <p className="mt-4 text-lg">Talk about an area both you and your partner could work on:</p>
         <textarea
           placeholder="Write feedback..."
           className="w-full h-28 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#63372C]"
