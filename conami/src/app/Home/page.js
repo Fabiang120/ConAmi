@@ -1,7 +1,7 @@
 "use client"
 import Sidebar from '../Components/sidebar.js';
 import BottomNav from '../Components/BottomNav.js';
-import { mockProfiles } from '../Profile/mockProfiles.js';
+import ProfilesList from './ProfilesList.js'; // default import is correct
 import {ProfileModal} from './ProfileModal.js';
 import { FiStar, FiUserCheck, FiUserPlus, FiMessageSquare } from "react-icons/fi";
 import { useState } from "react";
@@ -23,13 +23,14 @@ export default function Home() {
       </div>
     );
   };
-  // ADDED USER - add notifcation feature later
+
+  // ADDED USER - add notification feature later
   const [addedUsers, setAdded] = useState({});
   const handleAdded = (id) => {
     setAdded(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  //PROFILE SELECTION
+  // PROFILE SELECTION (optional if you want centralized modal)
   const [selectedProfile, setSelectedProfile] = useState(null);
 
   const router = useRouter();
@@ -51,64 +52,15 @@ export default function Home() {
                 <br />FRIEND.
               </span>
             </h1>
-            {mockProfiles.map((profile) => (
-              <div
-              key={profile.id}
-              onClick={() => setSelectedProfile(profile)}
-              className="bg-white rounded-3xl shadow-lg p-5 hover:shadow-xl transition flex flex-col justify-between cursor-pointer"
-        >
-          <div className="flex gap-3">
-            {/* PICTURE PLACEHOLDER*/}
-            <div className="w-10 h-10 bg-[#63372C] rounded-full flex-shrink-0"></div>
-            <div className="flex flex-col">
-              
-              <div className="flex items-baseline gap-8">
-                <span className="text-2xl font-semibold">
-                  {profile.username}
-                </span>
-                <span className="text-gray-400 text-sm font-normal">
-                  {profile.age} yrs
-                </span>
-              </div>
-              <span className="text-sm text-gray-500">
-                {renderStars(profile.rating)}
-              </span>
 
-            </div>
+            {/* Render the profiles list component directly */}
+            <ProfilesList />
+            
           </div>
-          <div className="flex items-center gap-10 mt-5">
-            <p className="text-gray-600 mb-1">
-              Fluent in:<br/> {profile.fluent}
-            </p>
-
-            <p className="text-gray-600 mb-1">
-              To Practice:<br/> {profile.practice}
-            </p>
-          </div>
-          <div className="flex justify-between items-center">
-          <p className="text-gray-500 mt-3">
-            From {profile.country}
-          </p>
-          <span className="flex text-3xl mt-6 cursor-pointer "
-          onClick={(e) => {
-            e.stopPropagation();
-            // handleAdded(profile.id)
-            router.push(`/chat?user=${profile.username}`);
-            }}
-          >
-            <FiMessageSquare/>
-          {/* {addedUsers[profile.id] ? (<FiUserCheck/>) : (<FiUserPlus/>)} */}
-          </span>
-
-          </div>
-        </div>
-            ))}
-          </div>
-          
           {selectedProfile && (
             <ProfileModal
-            profile={selectedProfile}
-            onClose={() => setSelectedProfile(null)}
+              profile={selectedProfile}
+              onClose={() => setSelectedProfile(null)}
             />
           )}
         </div>
