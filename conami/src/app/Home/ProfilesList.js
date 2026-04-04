@@ -10,21 +10,21 @@ export default function ProfilesList() {
   const [selected, setSelected] = useState(null);
   const router = useRouter();
 
-  const renderStars = (rating) => {
-    if (typeof rating !== "number") {
-      return <span className="text-gray-400 text-sm">No Reviews</span>;
-    }
-    return (
-      <div className="flex text-xs items-center text-yellow-500">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <FiStar
-            key={i}
-            className={i < Math.round(rating) ? "fill-yellow-500" : "text-gray-300"}
-          />
-        ))}
-      </div>
-    );
-  };
+  // const renderStars = (rating) => {
+  //   if (typeof rating !== "number") {
+  //     return <span className="text-gray-400 text-sm">No Reviews</span>;
+  //   }
+  //   return (
+  //     <div className="flex text-xs items-center text-yellow-500">
+  //       {Array.from({ length: 5 }).map((_, i) => (
+  //         <FiStar
+  //           key={i}
+  //           className={i < Math.round(rating) ? "fill-yellow-500" : "text-gray-300"}
+  //         />
+  //       ))}
+  //     </div>
+  //   );
+  // };
 
   useEffect(() => {
     let mounted = true;
@@ -62,7 +62,7 @@ export default function ProfilesList() {
                   <span className="text-2xl font-semibold">{profile.username}</span>
                   <span className="text-gray-400 text-sm font-normal">{profile.age} yrs</span>
                 </div>
-                <span className="text-sm text-gray-500">{renderStars(profile.rating)}</span>
+                {/* <span className="text-sm text-gray-500">{renderStars(profile.rating)}</span> */}
               </div>
             </div>
 

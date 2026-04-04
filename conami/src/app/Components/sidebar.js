@@ -14,7 +14,7 @@ export default function Sidebar() {
                 <ul className="space-y-6">
                     <li>
                         <Link
-                            href="/Profile"
+                            href="/Profile/User-View"
                             className="flex items-center gap-3 text-[#f0e1d1] hover:text-white text-xl font-medium transition-colors"
                         >
                             <FiUser size={26} />

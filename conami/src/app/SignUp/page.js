@@ -34,7 +34,7 @@ export default function SignUp() {
             return;
         }
         await refreshUser();
-        router.push("/Home");
+        router.push("/Profile");
     };
 
     return (
