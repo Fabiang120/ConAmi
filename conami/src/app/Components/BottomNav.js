@@ -12,7 +12,7 @@ export default function BottomNav() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/Profile" className="text-[#f0e1d1] hover:text-white">
+                        <Link href="/Profile/User-View" className="text-[#f0e1d1] hover:text-white">
                             <FiUser size={26} />
                         </Link>
                     </li>

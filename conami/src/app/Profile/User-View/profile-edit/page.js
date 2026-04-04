@@ -1,10 +1,10 @@
 "use client";
-import Sidebar from "../Components/sidebar.js";
-import BottomNav from "../Components/BottomNav.js";
+import Sidebar from "@/app/Components/sidebar.js";
+import BottomNav from "@/app/Components/BottomNav";
 import { FiSend } from "react-icons/fi";
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation.js";
-export default function Profile() {
+export default function EditProfile() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [language, setLanguage] = useState("");
@@ -43,24 +43,10 @@ export default function Profile() {
             </div>
             <div className="col-span-12 md:col-span-9 lg:col-span-10 bg-[#f0e1d1] font-sans pb-16">
                 <h1 className="text-3xl py-4 font-semibold mb-6 justify-center items-center leading-tight tracking-tight flex">
-                    Create your profile
+                    Edit your profile
                 </h1>
                 <div className="w-full max-w-5xl mx-auto space-y-8">
                     <div className="flex gap-6 justify-center">
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="px-4 py-2 rounded-lg border border-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-brown-400"
-                        />
-                        <input
-                            type="text"
-                            placeholder="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
-                        />
                         <select
                             value={LanguageSpoken}
                             onChange={(e) => setLanguageSpoken(e.target.value)}
@@ -70,8 +56,7 @@ export default function Profile() {
                             <option value="english">English</option>
                             <option value="spanish">Spanish</option>
                         </select>
-                    </div>
-                    <div className="flex gap-6 justify-center">
+                    
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
