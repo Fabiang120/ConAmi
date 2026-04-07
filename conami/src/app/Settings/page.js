@@ -55,7 +55,13 @@ export default function Settings() {
 }
 
 function AppearanceSection() {
-    return <h2>Appearance</h2>
+    return (
+        <div>
+            <h2>Appearance</h2>
+            {/* Change App UI to Dark Mode */}
+            {/* Make Chat Font larger */}
+        </div >
+    );
 }
 function BlockedUsersSection() {
     const [blockedUsers, setBlockedUsers] = useState([
@@ -175,5 +181,12 @@ function LoginDetailsSection() {
 }
 
 function HelpCenterSection() {
-    return <h2>Help Center</h2>
+    return (
+        <div>
+            <h2>Help Center</h2>
+            {/* Report User search bar possibly button too */}
+            {/* Chat with support text box */}
+        </div>
+    );
+
 }

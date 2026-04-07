@@ -277,3 +277,23 @@ def get_conversations_with_messages(
             messages = messages_
         ))
     return result
+
+# Language learning, country, gender, language spoken, profile picture (possibly create user info table) post and get
+
+# Search Blocked Users Route
+
+# Post Blocked Users Route
+
+# Get Blocked Users Route - new db table
+
+# Update Username Route
+
+# Update Password Route
+
+# Update Email Route - Would need to add email to database
+
+# Update 2FA - set up lastly if possible
+
+# Post Report Users - possibly on first offense show message and on third ban
+
+# Post support chat textbox 
