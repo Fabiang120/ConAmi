@@ -9,7 +9,7 @@ import { RiCustomerService2Line } from "react-icons/ri";
 import { LuMoon, LuType } from "react-icons/lu";
 
 export default function Settings() {
-    const [activeSection, setActiveSection] = useState("Appearance");
+    const [activeSection, setActiveSection] = useState("appearance");
     return (
         <div className="grid grid-cols-12 min-h-screen">
             <div className="hidden md:block md:col-span-3 lg:col-span-2">
@@ -62,39 +62,41 @@ function AppearanceSection() {
     const [fontSize, setFontSize] = useState("medium");
     return (
         <div>
-            <h2 className="text-3xl font-semibold tracking-tight">Appearance Settings</h2>
-            <p className="text-sm font-normal leading-5">Customize the way ConAmi looks and feels for you.</p>
-            <div className="flex justify-between items-center mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3">
+            <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Appearance Settings</h2>
+            <p className="text-[1rem] font-normal leading-6">Customize the way ConAmi looks and feels for you.</p>
+            <div className="flex flex-col lg:flex-row md:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-24">
                 <div className="flex justify-start items-center gap-4">
                     <LuMoon className="text-[#63372c]" size={40} />
                     <div>
-                        <h3>Dark Mode</h3>
-                        <p>Switch between light and dark appearance.</p>
+                        <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Dark Mode</h3>
+                        <p className="text-[1rem] font-normal leading-6">Switch between light and dark appearance.</p>
                     </div>
                 </div>
-                <button
-                    onClick={() => setDarkMode(!darkMode)}
-                    className={`w-28 h-12 rounded-full px-2 flex items-center bg-[#63372c] ${
-                        darkMode ? "justify-end" : "justify-start"
-                    }`}
-                >
-                    <div className={`flex w-full justify-between items-center px-2 ${darkMode ? "flex-row" : "flex-row-reverse"}`}>
-                        <span className="text-white text-sm font-medium">
-                            {darkMode ? "On" : "Off"}
-                        </span>
-                        <span className="w-8 h-8 rounded-full bg-white block"></span>
-                    </div>
-                </button>
+                <div>
+                    <button
+                        onClick={() => setDarkMode(!darkMode)}
+                        className={`w-28 h-12 rounded-full px-2 flex items-center bg-[#63372c] ${darkMode ? "justify-end" : "justify-start"
+                            }`}
+                    >
+                        <div className={`flex w-full justify-between items-center px-2 ${darkMode ? "flex-row" : "flex-row-reverse"}`}>
+                            <span className="text-white text-sm font-medium">
+                                {darkMode ? "On" : "Off"}
+                            </span>
+                            <span className="w-8 h-8 rounded-full bg-white block"></span>
+                        </div>
+                    </button>
                 </div>
-            <div className="flex justify-between items-center mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3">
+            </div>
+            <div className="flex flex-col lg:flex-row md:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-24">
                 <div className="flex justify-start items-center gap-4">
                     <LuType className="text-[#63372c]" size={40} />
                     <div>
-                        <h3>Font Size</h3>
-                        <p>Adjust text size for easier reading.</p>
+                        <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Font Size</h3>
+                        <p className="text-[1rem] font-normal leading-6">Adjust text size for preference</p>
                     </div>
                 </div>
-                <div className="flex border-2 border-[#63372c] justify-center rounded-md overflow-hidden">
+
+                <div className="flex w-fit border-2 border-[#63372c] rounded-md  md:self-auto">
                     <button
                         onClick={() => setFontSize("small")}
                         className={`px-6 py-3 text-sm font-medium ${fontSize === "small"
@@ -135,34 +137,33 @@ function BlockedUsersSection() {
     ]);
     return (
         <div>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 {/* This part will be on the top left of the main part */}
-                <div>
-                    <h2 className="text-3xl font-semibold tracking-tight">Blocked Users List</h2>
-                    <p className="text-sm font-normal leading-5">Manage your blocked list to control who can interact with you.</p>
+                <div className="flex flex-col justify-center items-center md:items-start gap-4">
+                    <h2 className="text-[2rem] font-semibold leading-tight text-center tracking-tight">Blocked Users List</h2>
+                    <p className="text-[1rem] font-normal text-center leading-6">Manage your blocked list to control who can interact with you.</p>
                 </div>
                 <div className="flex items-center gap-3 ">
                     <input
                         type="text"
                         placeholder="Search by username..."
-                        className="flex-1 rounded-md px-4 py-2 bg-white/70 border border-[#63372c] text-sm font-normal"
+                        className="flex-1 rounded-md py-2 text-center bg-white/70 border border-[#63372c] text-sm font-normal"
                     />
-                    <button className="px-4 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium">+ Add User</button>
+                    <button className="px-2 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium">+ Add User</button>
                 </div>
             </div>
-            <p className="text-sm font-medium mt-4">Total Blocked: {blockedUsers.length} </p>
-            {/* This part will be on the top right of the main part = search bar */}
+            <p className="text-[1rem] font-normal leading-6 mt-5">Total Blocked: {blockedUsers.length} </p>
             {/* This part will be below the top part and will be a list of blocked users */}
-            <div className="grid grid-cols-4 gap-4 mt-5 ">
+            <div className="grid md:grid-cols-4 gap-4 mt-5 ">
                 {blockedUsers.map((user) => (
                     <div
                         key={user.id}
                         className="h-40 bg-white/70 border-2 border-[#63372c] rounded-md p-4 flex flex-col justify-between"
                     >
                         <div>
-                            <h3 className="text-lg font-medium tracking-tight">{user.username}</h3>
+                            <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">{user.username}</h3>
                         </div>
-                        <p className="text-sm font-normal leading-5 mt-2">
+                        <p className="text-[1rem] font-normal leading-6 mt-2">
                             Note: {user.note}
                         </p>
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">
@@ -186,14 +187,14 @@ function LoginDetailsSection() {
 
     return (
         <div>
-            <div className="flex flex-col justify-center items-start">
+            <div className="flex flex-col justify-center items-center md:items-start">
                 {/* This part will be on the top left of the main part */}
                 <div>
-                    <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Login Details Management</h2>
-                    <p className="text-[1rem] font-normal leading-6">Update and manage your primary account security settings</p>
+                    <h2 className="text-[2rem] font-semibold leading-tight tracking-tight text-center md:text-start">Login Details Management</h2>
+                    <p className="text-[1rem] font-normal leading-6 text-center md:text-start">Update and manage your primary account security settings</p>
                 </div>
-                <div className="grid grid-cols-1 gap-2 w-full">
-                    <div className="flex justify-between items-center  bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 min-h-25">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 justify-items-center md:w-full md:justify-items-stretch">
+                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuUser className="text-[#63372c]" size={50} />
                             <div>
@@ -204,7 +205,7 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Username</button>
                     </div>
 
-                    <div className="flex justify-between items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 min-h-25">
+                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuKeyRound className="text-[#63372c]" size={50} />
                             <div>
@@ -215,7 +216,7 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Update Password</button>
                     </div>
 
-                    <div className="flex justify-between items-center  bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 min-h-25">
+                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuMail className="text-[#63372c]" size={50} />
                             <div>
@@ -226,11 +227,11 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Email</button>
                     </div>
 
-                    <div className="flex justify-between items-center  bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 min-h-25">
+                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuShieldCheck className="text-[#63372c]" size={50} />
                             <div>
-                                <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Two-Factor Authentication (2FA)</h3>
+                                <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">2FA</h3>
                                 <p className="text-[1rem] font-normal leading-6">Info: {twofa ? "Enabled" : "Disabled"}</p>
                             </div>
                         </div>
@@ -248,6 +249,7 @@ function HelpCenterSection() {
     return(
         <div>
             <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Get The Support You Need!</h2>
+            <p className="text-[1rem] font-normal leading-6">We're here to help you with any questions or issues you may have.</p>
             <div className="flex flex-row items-start justify-center rounded-md gap-10 mt-10">
                 <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md px-5 py-10">
                     <LuTriangleAlert className="text-[#63372c]" size={50} />
