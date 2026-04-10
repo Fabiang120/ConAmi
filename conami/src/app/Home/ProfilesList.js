@@ -16,9 +16,9 @@ export default function ProfilesList() {
     let mounted = true;
 
     const load = async () => {
-      try{
+      try {
         setLoading(true);
-        const meRes = await fetch("http://localhost:8000/auth/me",{
+        const meRes = await fetch("http://localhost:8000/auth/me", {
           credentials: "include",
         })
         const meData = await meRes.json();
@@ -28,15 +28,15 @@ export default function ProfilesList() {
           credentials: "include",
         })
         if (!userRes.ok) throw new Error("Network error");
-        
+
         const users = await userRes.json();
         console.log("USERS FROM BACKEND:", users);
-      
+
         if (mounted) {
           setCurrent(username);
           setProfiles(users.filter(p => p.username !== username));
         }
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         if (mounted) setProfiles([]);
       } finally {
@@ -55,9 +55,10 @@ export default function ProfilesList() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-75 p-8">
-        {profiles.map((profile) => (
+        {/* Added index here and to the key below */}
+        {profiles.map((profile, index) => (
           <div
-            key={profile.username}
+            key={profile.username || index}
             onClick={() => setSelected(profile)}
             className="bg-white rounded-3xl shadow-lg p-6 min-w-[250px] shadow-xl hover:shadow-2xl transition flex flex-col justify-between cursor-pointer"
           >

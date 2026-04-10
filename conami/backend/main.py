@@ -2,7 +2,7 @@ import os
 import re
 from pydantic import BaseModel, Field as PydanticField
 from typing import Annotated
-from fastapi import Depends, FastAPI, HTTPException, Query, Body, Response, Cookie
+from fastapi import Depends, FastAPI, HTTPException, Query, Body, Response, Cookie, Path
 from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -426,9 +426,9 @@ def block_user(
 def get_blocked_users(
     session: SessionDep,
     username: Annotated[str, Depends(get_username_from_cookie)]
-) -> list[str]:
+) -> list[BlockedUser]: 
     blocked_users = session.exec(
-        select(BlockedUser.blocked_username).where(BlockedUser.blocker_username == username)
+        select(BlockedUser).where(BlockedUser.blocker_username == username)
     ).all()
     return blocked_users
 
