@@ -1,12 +1,11 @@
 "use client";
-import Link from "next/link";
+
+import React, { useState, useEffect } from "react";
 import BottomNav from "../Components/BottomNav.js";
 import Sidebar from "../Components/sidebar.js"
-import { useState } from "react";
-import { LuUser, LuKeyRound, LuShieldCheck, LuMail } from "react-icons/lu";
-import { LuTriangleAlert } from "react-icons/lu";
+import { LuUser, LuKeyRound, LuShieldCheck, LuMail, LuTriangleAlert, LuMoon, LuType } from "react-icons/lu";
 import { RiCustomerService2Line } from "react-icons/ri";
-import { LuMoon, LuType } from "react-icons/lu";
+
 
 export default function Settings() {
     const [activeSection, setActiveSection] = useState("appearance");
@@ -21,26 +20,22 @@ export default function Settings() {
                 </div>
                 <ul className="ml-2 flex space-x-4 text-[#63372c]/80 text-base">
                     <li className="cursor-pointer hover:text-[#63372c]">
-                        <button
-                            onClick={() => setActiveSection("appearance")}>
+                        <button onClick={() => setActiveSection("appearance")}>
                             Appearance
                         </button>
                     </li>
                     <li className="cursor-pointer hover:text-[#63372c]">
-                        <button
-                            onClick={() => setActiveSection("blocked")}>
+                        <button onClick={() => setActiveSection("blocked")}>
                             Blocked Users
                         </button>
                     </li>
                     <li className="cursor-pointer hover:text-[#63372c]">
-                        <button
-                            onClick={() => setActiveSection("login")}>
+                        <button onClick={() => setActiveSection("login")}>
                             Login Details
                         </button>
                     </li>
                     <li className="cursor-pointer hover:text-[#63372c]">
-                        <button
-                            onClick={() => setActiveSection("help")}>
+                        <button onClick={() => setActiveSection("help")}>
                             Help Center
                         </button>
                     </li>
@@ -77,8 +72,7 @@ function AppearanceSection() {
                 <div>
                     <button
                         onClick={() => setDarkMode(!darkMode)}
-                        className={`w-28 h-12 rounded-full px-2 flex items-center bg-[#63372c] ${darkMode ? "justify-end" : "justify-start"
-                            }`}
+                        className={`w-28 h-12 rounded-full px-2 flex items-center bg-[#63372c] ${darkMode ? "justify-end" : "justify-start"}`}
                     >
                         <div className={`flex w-full justify-between items-center px-2 ${darkMode ? "flex-row" : "flex-row-reverse"}`}>
                             <span className="text-white text-sm font-medium">
@@ -98,31 +92,22 @@ function AppearanceSection() {
                     </div>
                 </div>
 
-                <div className="flex w-fit border-2 border-[#63372c] rounded-md  md:self-auto">
+                <div className="flex w-fit border-2 border-[#63372c] rounded-md md:self-auto">
                     <button
                         onClick={() => setFontSize("small")}
-                        className={`px-6 py-3 text-sm font-medium ${fontSize === "small"
-                                ? "bg-[#63372c] text-white"
-                                : "bg-white/70 text-[#63372c]"
-                            }`}
+                        className={`px-6 py-3 text-sm font-medium ${fontSize === "small" ? "bg-[#63372c] text-white" : "bg-white/70 text-[#63372c]"}`}
                     >
                         Small
                     </button>
                     <button
                         onClick={() => setFontSize("medium")}
-                        className={`px-6 py-3 text-sm font-medium border-l-2 border-r-2 border-[#63372c] ${fontSize === "medium"
-                                ? "bg-[#63372c] text-white"
-                                : "bg-white/70 text-[#63372c]"
-                            }`}
+                        className={`px-6 py-3 text-sm font-medium border-l-2 border-r-2 border-[#63372c] ${fontSize === "medium" ? "bg-[#63372c] text-white" : "bg-white/70 text-[#63372c]"}`}
                     >
                         Medium
                     </button>
                     <button
                         onClick={() => setFontSize("large")}
-                        className={`px-6 py-3 text-sm font-medium ${fontSize === "large"
-                                ? "bg-[#63372c] text-white"
-                                : "bg-white/70 text-[#63372c]"
-                            }`}
+                        className={`px-6 py-3 text-sm font-medium ${fontSize === "large" ? "bg-[#63372c] text-white" : "bg-white/70 text-[#63372c]"}`}
                     >
                         Large
                     </button>
@@ -131,12 +116,66 @@ function AppearanceSection() {
         </div>
     );
 }
+
 function BlockedUsersSection() {
-    const [blockedUsers, setBlockedUsers] = useState([
-        { id: 1, username: "user1", note: "Repeated offensive language" },
-        { id: 2, username: "user2", note: "Spamming in comments" },
-        { id: 3, username: "user3", note: "Harassment in messages" },
-    ]);
+    const [blockedUsers, setBlockedUsers] = useState([]);
+    const [PersonToBlock, setPersonToBlock] = useState("");
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const getBlockedUsers = async () => {
+            try {
+                const res = await fetch("http://localhost:8000/users/blocked", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                });
+
+                if (!res.ok) {
+                    setError("Failed to get blocked users.");
+                    return;
+                }
+
+                const data = await res.json();
+                setBlockedUsers(data);
+            } catch (err) {
+                setError("Network error occurred.");
+            }
+        };
+
+        getBlockedUsers();
+    }, []);
+
+    const AddUserToBlock = async (e) => {
+        e.preventDefault();
+        if (!PersonToBlock.trim()) return;
+        try {
+            const res = await fetch("http://localhost:8000/users/block/" + PersonToBlock, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to block user.");
+                return;
+            }
+
+            setBlockedUsers((prev) => [...prev, data]);
+            setPersonToBlock("");
+            setError(null);
+
+        } catch (err) {
+            setError("Network error occurred.");
+        }
+    }
+
     return (
         <div>
             <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
@@ -149,26 +188,36 @@ function BlockedUsersSection() {
                     <input
                         type="text"
                         placeholder="Search by username..."
+                        value={PersonToBlock}
+                        onChange={(e) => setPersonToBlock(e.target.value)}
                         className="flex-1 rounded-md py-2 text-center bg-white/70 border border-[#63372c] text-sm font-normal"
                     />
-                    <button className="px-2 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium">+ Add User</button>
+                    <button
+                        className="px-2 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium"
+                        onClick={(e) => AddUserToBlock(e)}
+                    >
+                        + Add User
+                    </button>
                 </div>
             </div>
+
             <p className="text-[1rem] font-normal leading-6 mt-5">Total Blocked: {blockedUsers.length} </p>
+            {error && <p className="text-red-500 mt-2">{error}</p>}
+
             {/* This part will be below the top part and will be a list of blocked users */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5 ">
-                {blockedUsers.map((user) => (
+                {blockedUsers.map((user, index) => (
                     <div
-                        key={user.id}
+                        key={user.id || index}
                         className="h-40 bg-white/70 border-2 border-[#63372c] rounded-md p-4 flex flex-col justify-between"
                     >
                         <div>
-                            <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">{user.username}</h3>
+                            <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">{user.blocked_username}</h3>
                         </div>
-                        <p className="text-[1rem] font-normal leading-6 mt-2">
-                            Note: {user.note}
+                        <p className="text-[1rem] font-normal leading-6 mt-2 italic text-gray-500">
+                            Blocked User
                         </p>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">
+                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none hover:bg-[#4a2921]">
                             Unblock
                         </button>
                     </div>
@@ -248,36 +297,122 @@ function LoginDetailsSection() {
 }
 
 function HelpCenterSection() {
-    return(
+    const [PersonToReport, setPersonToReport] = useState("");
+    const [MessageToSupport, setMessageToSupport] = useState("");
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+
+    const ReportUser = async (e) => {
+        e.preventDefault();
+        if (!PersonToReport.trim()) return;
+
+        try {
+            const res = await fetch("http://localhost:8000/users/report/" + PersonToReport, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ reason: "Reported from Help Center" })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to report user.");
+                setSuccessMessage(null);
+                return;
+            }
+
+            setPersonToReport("");
+            setError(null);
+            setSuccessMessage("User reported successfully.");
+
+        } catch (err) {
+            setError("Network error occurred.");
+            setSuccessMessage(null);
+        }
+    }
+
+    const SendTicket = async (e) => {
+        e.preventDefault();
+        if (!MessageToSupport.trim()) return;
+
+        try {
+            const res = await fetch("http://localhost:8000/support/message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ message: MessageToSupport })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to send ticket.");
+                setSuccessMessage(null);
+                return;
+            }
+
+            setMessageToSupport("");
+            setError(null);
+            setSuccessMessage("Support ticket sent successfully!");
+
+        } catch (err) {
+            setError("Network error occurred.");
+            setSuccessMessage(null);
+        }
+    }
+
+    return (
         <div className="flex flex-col justify-center items-center xl:items-start">
-            <div>
+            <div className="text-center xl:text-left flex flex-col items-center xl:items-start">
                 <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Get The Support You Need!</h2>
-                <p className="text-[1rem] font-normal leading-6">We're here to help you with any questions or issues you may have.</p>
+                <p className="text-[1rem] font-normal leading-6 mt-1">We're here to help you with any questions or issues you may have.</p>
+
+                {error && <p className="text-red-600 font-medium mt-2">{error}</p>}
+                {successMessage && <p className="text-green-600 font-medium mt-2">{successMessage}</p>}
             </div>
-            <div className="flex flex-col xl:flex-row items-start justify-center rounded-md gap-10 mt-10">
+
+            <div className="flex flex-col xl:flex-row items-start justify-center rounded-md gap-10 mt-6">
                 <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md w-120 md:px-5 py-10">
                     <LuTriangleAlert className="text-[#63372c]" size={50} />
-                    <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Report a User</h3>
-                    <p className="text-[1rem] font-normal leading-6">Search for a username to submit a Behavioral Report.</p>
-                    <div className="flex items-center gap-3 mt-5">
+                    <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight mt-2">Report a User</h3>
+                    <p className="text-[1rem] font-normal leading-6 text-center px-4">Search for a username to submit a Behavioral Report.</p>
+                    <div className="flex items-center gap-3 mt-5 w-full px-6">
                         <input
                             type="text"
                             placeholder="Find User to Report"
+                            value={PersonToReport}
+                            onChange={(e) => setPersonToReport(e.target.value)}
                             className="flex-1 rounded-md px-4 py-2 bg-white/70 border-2 border-[#63372c] text-sm font-normal"
                         />
-                        <button className="px-4 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium">Send Message</button>
+                        <button
+                            className="px-4 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium hover:bg-[#4a2921]"
+                            onClick={(e) => ReportUser(e)}
+                        >
+                            Report
+                        </button>
                     </div>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md w-120 px-10 py-15">
+
+                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md w-120 px-10 py-10">
                     <RiCustomerService2Line className="text-[#63372c]" size={50} />
-                    <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Chat with Support</h3>
-                    <p className="text-[1rem] font-normal leading-6 mt-2">Send a message to our support team for assistance.</p>
-                    <div className="mt-8 w-full max-w-md">
+                    <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight mt-2">Chat with Support</h3>
+                    <p className="text-[1rem] font-normal leading-6 mt-2 text-center">Send a message to our support team for assistance.</p>
+                    <div className="mt-6 w-full max-w-md">
                         <textarea
                             placeholder="How can we assist you?"
+                            value={MessageToSupport}
+                            onChange={(e) => setMessageToSupport(e.target.value)}
                             className="w-full h-32 rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal resize-none"
                         />
-                        <button className="mt-4 w-full bg-[#63372c] text-white rounded-md text-sm font-medium py-3">
+                        <button
+                            className="mt-4 w-full bg-[#63372c] text-white rounded-md text-sm font-medium py-3 hover:bg-[#4a2921]"
+                            onClick={(e) => SendTicket(e)}
+                        >
                             Send Message
                         </button>
                     </div>
