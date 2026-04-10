@@ -12,6 +12,11 @@ export default function ProfileView() {
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
 
+  const UppercaseVar = (str) => {
+    if(!str) return "-"
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const handleEditClick = () =>{
     router.push("/Profile/User-View/profile-edit")
   };
@@ -23,30 +28,78 @@ export default function ProfileView() {
           credentials: "include"
          });
          if(!userRes.ok) throw new Error("Failed to fetch user");
-         const realUser = await userRes.json();
-         setUser(realUser);
+         const userData = await userRes.json();
+
+         let profileData = {};
+          
+        const profileRes = await fetch("http://localhost:8000/profile", {
+          credentials: "include",
+         });
+
+         if(profileRes.ok){
+          profileData = await profileRes.json();
+         }
+         setUser({
+          ...userData,
+          ...profileData,
+         });
+
+         if(profileData?.image){
+          setImage(profileData.image);
+         }
+
        } catch (err){
          console.error(err);
        }
      };
+
      fetchUser();
    }, []);
+
     if(!user) return <div>Loading...</div>;
 //clicking
    const handlePlusClick = () =>{
     fileInputRef.current.click();
    };
 
-   const handleFileChange = (e) => {
+   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if(!file) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Profile_Images");
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result);
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dwaj95bl4/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      const imageUrl = data.secure_url;
+      setImage(imageUrl);
+
+      setUser((prev) => ({
+            ...prev,
+      }));
+
+      await fetch("http://localhost:8000/profile", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type" : "application/json",
+        },
+        body: JSON.stringify({
+          image: imageUrl,
+        }),
+      });
+    } catch (err){
+      console.error("image uplaod failed:", err);
+    }
     };
-    reader.readAsDataURL(file);
-   }
     
     return (
             <div className="grid grid-cols-12 min-h-screen">
@@ -91,7 +144,7 @@ export default function ProfileView() {
         <div className="text-center mt-16 space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">{user.username}</h1>
           <p className=" text-sm">{user.email}</p>
-          <p className=" text-sm">{user.gender} • {user.age}</p>
+          <p className=" text-sm">{UppercaseVar(user.gender) || "-"} • {user.age ?? "-"}</p>
         </div>
 
       <div className="mt-8 px-4 sm:px-10">
@@ -101,22 +154,22 @@ export default function ProfileView() {
     {/* Left Box - Fluent In */}
     <div className="flex flex-col items-center gap-1">
       <FiStar size={30} className="text-yellow-500"/>
-      <p className="text-lg font-semibold truncate">{user.fluent}</p>
+      <p className="text-lg font-semibold truncate">{UppercaseVar(user.fluent)}</p>
       <p className="text-xs tracking-wide truncate">FLUENT IN</p>
     </div>
 
     {/* Middle Box - Practicing */}
     <div className="flex flex-col items-center gap-1">
       <FiBookOpen size={30} className="text-blue-500"/>
-      <p className="text-lg font-semibold">{user.practice}</p>
-      <p className="text-xs text-gray-500">{user.proficiency}</p>
+      <p className="text-lg font-semibold">{UppercaseVar(user.practice)}</p>
+      
       <p className="text-xs tracking-wide">PRACTICING</p>
     </div>
 
     {/* Right Box - Country */}
     <div className="flex flex-col items-center gap-1">
       <FiGlobe size={30} className="text-green-700"/>
-      <p className="text-lg font-semibold truncate">{user.country}</p>
+      <p className="text-lg font-semibold truncate">{UppercaseVar(user.country)}</p>
       <p className="text-xs tracking-wide truncate">COUNTRY</p>
     </div>
     

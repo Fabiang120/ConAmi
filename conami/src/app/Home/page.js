@@ -8,21 +8,6 @@ import { useState } from "react";
 import { useRouter } from 'next/navigation.js';
 
 export default function Home() {
-  const renderStars = (rating) => {
-    if (typeof rating !== "number") {
-      return <span className="text-gray-400 text-sm">No Reviews</span>;
-    }
-    return (
-      <div className="flex text-xs items-center text-yellow-500">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <FiStar
-            key={i}
-            className={i < Math.round(rating) ? "fill-yellow-500" : "text-gray-300"}
-          />
-        ))}
-      </div>
-    );
-  };
 
   // ADDED USER - add notification feature later
   const [addedUsers, setAdded] = useState({});

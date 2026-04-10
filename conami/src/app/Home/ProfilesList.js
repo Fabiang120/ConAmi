@@ -8,39 +8,46 @@ export default function ProfilesList() {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [current, setCurrent] = useState(null);
   const router = useRouter();
 
-  // const renderStars = (rating) => {
-  //   if (typeof rating !== "number") {
-  //     return <span className="text-gray-400 text-sm">No Reviews</span>;
-  //   }
-  //   return (
-  //     <div className="flex text-xs items-center text-yellow-500">
-  //       {Array.from({ length: 5 }).map((_, i) => (
-  //         <FiStar
-  //           key={i}
-  //           className={i < Math.round(rating) ? "fill-yellow-500" : "text-gray-300"}
-  //         />
-  //       ))}
-  //     </div>
-  //   );
-  // };
 
   useEffect(() => {
     let mounted = true;
-    fetch("http://localhost:8000/users/")
-      .then((res) => {
-        if (!res.ok) throw new Error("Network error");
-        return res.json();
-      })
-      .then((data) => {
-        if (mounted) setProfiles(data);
-      })
-      .catch(() => {
+
+    const load = async () => {
+      try{
+        setLoading(true);
+        const meRes = await fetch("http://localhost:8000/auth/me",{
+          credentials: "include",
+        })
+        const meData = await meRes.json();
+        const username = meData.username;
+
+        const userRes = await fetch("http://localhost:8000/users/", {
+          credentials: "include",
+        })
+        if (!userRes.ok) throw new Error("Network error");
+        
+        const users = await userRes.json();
+        console.log("USERS FROM BACKEND:", users);
+      
+        if (mounted) {
+          setCurrent(username);
+          setProfiles(users.filter(p => p.username !== username));
+        }
+      } catch(err) {
+        console.error(err);
         if (mounted) setProfiles([]);
-      })
-      .finally(() => mounted && setLoading(false));
-    return () => (mounted = false);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) return <div className="p-4">Loading profiles...</div>;
@@ -50,7 +57,7 @@ export default function ProfilesList() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-75 p-8">
         {profiles.map((profile) => (
           <div
-            key={profile.id}
+            key={profile.username}
             onClick={() => setSelected(profile)}
             className="bg-white rounded-3xl shadow-lg p-6 min-w-[250px] shadow-xl hover:shadow-2xl transition flex flex-col justify-between cursor-pointer"
           >

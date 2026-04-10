@@ -75,6 +75,25 @@ class SupportTicket(SQLModel, table=True):
     is_resolved: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class Profile(SQLModel, table=True):
+    username: str = Field(primary_key=True, foreign_key="user.username")
+    email: str | None = None
+    gender: str | None = None
+    age: int | None = None
+    country: str | None = None
+    fluent: str | None = None
+    practice: str | None = None
+    image: str | None = None
+
+class ProfileCreate(BaseModel):
+    email: str | None = None
+    gender: str | None = None
+    age: int | None = None
+    country: str | None = None
+    fluent: str | None = None
+    practice: str | None = None
+    image: str | None = None
+
 class Conversations(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user1: str = Field(foreign_key="user.username")
@@ -98,7 +117,6 @@ class ConversationWithMessages(SQLModel):
 
 database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url)
-
 
 # with creates session with database url puts that into session and then gets called but pauses due to yield session
 # We use yield here instead of return to maintain session open for methods when they call this
@@ -186,6 +204,58 @@ def get_users(session: SessionDep) -> list[str]:
     usernames = session.exec(select(User.username)).all()
     return usernames
 
+# Profile save
+@app.post("/profile")
+def create_or_update_profile(data: ProfileCreate, session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]):
+    profile = session.get(Profile, username)
+
+    if not profile:
+        profile = Profile(username=username)
+
+    if data.email is not None:
+        profile.email = data.email
+    if data.gender is not None:
+        profile.gender = data.gender
+    if data.age is not None:
+        profile.age = data.age
+    if data.country is not None:
+        profile.country = data.country
+    if data.fluent is not None:
+        profile.fluent = data.fluent
+    if data.practice is not None:
+        profile.practice = data.practice
+    if data.image is not None:
+        profile.image = data.image
+
+    session.add(profile)
+    session.commit()
+    session.refresh(profile)
+    return profile
+
+@app.get("/profile")
+def get_profile(session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]):
+    profile = session.get(Profile, username)
+    if not profile:
+        return{
+            "username": username,
+            "email": None,
+            "gender": None,
+            "age": None,
+            "country": None,
+            "fluent": None,
+            "practice": None,
+            "image": None,
+        }
+    return {
+        "username": profile.username,
+        "email": profile.email,
+        "gender": profile.gender,
+        "age": profile.age,
+        "country": profile.country,
+        "fluent": profile.fluent,
+        "practice": profile.practice,
+        "image": profile.image,
+    }
 
 # LOGIN ENDPOINT AND CALLS CREATE TOKEN
 @app.post("/token")

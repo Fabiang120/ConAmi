@@ -10,10 +10,12 @@ export default function Profile() {
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
     const [gender, setGender] = useState("");
+    const [age, setAge] = useState("");
     const [LanguageSpoken, setLanguageSpoken] = useState("");
 
     const router = useRouter();
     const handleSave = async () => {
+        console.log("SAVE CLICKED");
         const res = await fetch("http://localhost:8000/profile", {
             method: "POST",
             headers: {
@@ -21,17 +23,16 @@ export default function Profile() {
             },
             credentials: "include",
             body: JSON.stringify({
-                username,
-                email,
-                language,
-                country,
-                gender,
+                email: email,
+                practice: language,
+                age: age,
+                country: country,
+                gender: gender,
                 fluent: LanguageSpoken
             }),
         });
         if(!res.ok){
-            alert("Failed to save profile");
-            return;
+            console.error("Failed to save profile");
         }
         router.push("/Home");
     }
@@ -47,13 +48,6 @@ export default function Profile() {
                 </h1>
                 <div className="w-full max-w-5xl mx-auto space-y-8">
                     <div className="flex gap-6 justify-center">
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="px-4 py-2 rounded-lg border border-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-brown-400"
-                        />
                         <input
                             type="text"
                             placeholder="email"
@@ -126,6 +120,13 @@ export default function Profile() {
                             <option value="male">Male</option>
                             <option value="other">Other</option>
                         </select>
+                        <input
+                            type="text"
+                            placeholder="age"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
+                        />
                     </div>
                     <div className="flex justify-center">
                         <button 
