@@ -3,7 +3,7 @@ import Sidebar from "../../Components/sidebar.js";
 import BottomNav from "../../Components/BottomNav.js";
 import { FiPlusCircle, FiEdit2, FiUser, FiGlobe, FiBookOpen, FiStar } from "react-icons/fi";
 import React, { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation.js";
+import { useRouter } from "next/navigation";
 import{ mockUser } from "./mockUser.js";
 
 export default function ProfileView() {
