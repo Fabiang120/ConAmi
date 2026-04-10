@@ -1,22 +1,15 @@
 "use client"
 import Sidebar from '../Components/sidebar.js';
 import BottomNav from '../Components/BottomNav.js';
-import ProfilesList from './ProfilesList.js'; // default import is correct
-import {ProfileModal} from './ProfileModal.js';
-import { FiStar, FiUserCheck, FiUserPlus, FiMessageSquare } from "react-icons/fi";
+import ProfilesList from './ProfilesList.js';
 import { useState } from "react";
 import { useRouter } from 'next/navigation.js';
 
 export default function Home() {
-
-  // ADDED USER - add notification feature later
   const [addedUsers, setAdded] = useState({});
   const handleAdded = (id) => {
     setAdded(prev => ({ ...prev, [id]: !prev[id] }));
   };
-
-  // PROFILE SELECTION (optional if you want centralized modal)
-  const [selectedProfile, setSelectedProfile] = useState(null);
 
   const router = useRouter();
 
@@ -37,17 +30,9 @@ export default function Home() {
                 <br />FRIEND.
               </span>
             </h1>
-
-            {/* Render the profiles list component directly */}
             <ProfilesList />
-            
+
           </div>
-          {selectedProfile && (
-            <ProfileModal
-              profile={selectedProfile}
-              onClose={() => setSelectedProfile(null)}
-            />
-          )}
         </div>
       </div>
       <BottomNav />

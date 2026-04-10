@@ -174,11 +174,15 @@ def set_auth_cookie(response: Response, username: str) -> None:
     )
 
 # SignUp API. route
+# SignUp API. route
 @app.post("/users/")
 def create_user(user: User, session: SessionDep, response: Response) -> dict:
-    check_regexes(user.username,user.password)
+    check_regexes(user.username, user.password)
     user.password = pwd_context.hash(user.password)
     session.add(user)
+    new_profile = Profile(username=user.username)
+    session.add(new_profile)
+    
     try:
         session.commit()
         session.refresh(user)
@@ -200,9 +204,10 @@ def get_current_user(
     return {"username": user.username}
 
 @app.get("/users/")
-def get_users(session: SessionDep) -> list[str]:
-    usernames = session.exec(select(User.username)).all()
-    return usernames
+def get_users(session: SessionDep) -> list[Profile]:
+    # Select from the Profile table so we get age, fluent, country, etc.
+    profiles = session.exec(select(Profile)).all()
+    return profiles
 
 # Profile save
 @app.post("/profile")
@@ -285,12 +290,16 @@ def login(
 def create_conversation(
     session: SessionDep, 
     username: Annotated[str, Depends(get_username_from_cookie)],
-    user2: str = Body(...)
-    ) -> Conversations:
+    # Added embed=True so it correctly parses the JSON object from React
+    user2: str = Body(..., embed=True) 
+) -> Conversations:
+
     if username == user2:
         raise HTTPException(status_code=400, detail="Cannot create conversation with yourself")
+    
     if session.get(User, user2) is None:
-        raise HTTPException(status_code=404, detail="User2 not found")
+        raise HTTPException(status_code=404, detail="User not found")
+        
     if username < user2:
         alphabetized_user1 = username
         alphabetized_user2 = user2
@@ -304,12 +313,15 @@ def create_conversation(
             (Conversations.user2 == alphabetized_user2)
         )
     ).first()
-    if(conversation_exists):
+    
+    if conversation_exists:
         return conversation_exists
-    new_conversation = Conversations(user1=alphabetized_user1,user2=alphabetized_user2)    
+        
+    new_conversation = Conversations(user1=alphabetized_user1, user2=alphabetized_user2)    
     session.add(new_conversation)
     session.commit()
     session.refresh(new_conversation)
+    
     return new_conversation
 
 # GET ALL CONVERSATIONS FOR A USER 
