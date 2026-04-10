@@ -104,7 +104,7 @@ export default function SignUp() {
                     <button type="submit" className="bg-[#63372c] text-[#f0e1d1] w-full h-12 rounded-md mt-4 font-bold text-sm shadow-md transition-all transform hover:-translate-y-1">
                         Sign Up
                     </button>
-                    <div className="min-h-[18px] text-center">
+                    <div className="min-h-4.5 text-center">
                         {error && (
                             <p className="text-red-500 text-center font-medium">
                                 {error}
