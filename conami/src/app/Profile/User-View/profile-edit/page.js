@@ -5,29 +5,32 @@ import { FiSend } from "react-icons/fi";
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation.js";
 export default function EditProfile() {
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
     const [gender, setGender] = useState("");
-    const [age, setAge] = useState("");
+    const [age, setAge] = useState(null);
     const [LanguageSpoken, setLanguageSpoken] = useState("");
 
     const router = useRouter();
     const handleSave = async () => {
         try{
+
+            const payload = {};
+            console.log("PAYLOAD:", payload);
+
+            if(LanguageSpoken) payload.fluent = LanguageSpoken;
+            if(country) payload.country = country;
+            if(gender) payload.gender = gender;
+            if(language) payload.practice = language;
+            if (age !== null) payload.age = age;
+
             const res = await fetch("http://localhost:8000/profile", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 credentials: "include",
-                body: JSON.stringify({
-                    fluent: LanguageSpoken,
-                    country: country,
-                    gender: gender,
-                    practice: language,
-                }),
+                body: JSON.stringify(payload),
             });
             if(!res.ok){
                 throw new Error("Failed to save profile");
@@ -38,6 +41,30 @@ export default function EditProfile() {
         }
 
     }
+    useEffect(() => {
+    const loadProfile = async () => {
+        try {
+            const res = await fetch("http://localhost:8000/profile", {
+                credentials: "include",
+            });
+
+            if (!res.ok) return;
+
+            const data = await res.json();
+
+            setLanguageSpoken(data.fluent || "");
+            setLanguage(data.practice || "");
+            setCountry(data.country || "");
+            setGender(data.gender || "");
+            setAge(data.age || "");
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    loadProfile();
+    }, []);
+
     
     return (
         <div className="grid grid-cols-12 min-h-screen">
@@ -55,7 +82,7 @@ export default function EditProfile() {
                             onChange={(e) => setLanguageSpoken(e.target.value)}
                             className="w-1/3 px-4 py-3 rounded-lg border border-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#63372c]"
                         >
-                            <option value="">Language you are Fluent in?</option>
+                            <option value="" disabled >Language you are Fluent in?</option>
                             <option value="english">English</option>
                             <option value="spanish">Spanish</option>
                         </select>
@@ -115,10 +142,10 @@ export default function EditProfile() {
                             <option value="other">Other</option>
                         </select>
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Age"
                             value={age}
-                            onChange={(e) => setAge(e.target.value)}
+                            onChange={(e) => setAge(e.target.value === "" ? null : Number(e.target.value))}
                             className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
                         />
                     </div>

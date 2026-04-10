@@ -12,6 +12,11 @@ export default function ProfileView() {
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
 
+  const UppercaseVar = (str) => {
+    if(!str) return "-"
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const handleEditClick = () =>{
     router.push("/Profile/User-View/profile-edit")
   };
@@ -139,7 +144,7 @@ export default function ProfileView() {
         <div className="text-center mt-16 space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">{user.username}</h1>
           <p className=" text-sm">{user.email}</p>
-          <p className=" text-sm">{user.gender} • {user.age}</p>
+          <p className=" text-sm">{UppercaseVar(user.gender) || "-"} • {user.age ?? "-"}</p>
         </div>
 
       <div className="mt-8 px-4 sm:px-10">
@@ -149,22 +154,22 @@ export default function ProfileView() {
     {/* Left Box - Fluent In */}
     <div className="flex flex-col items-center gap-1">
       <FiStar size={30} className="text-yellow-500"/>
-      <p className="text-lg font-semibold truncate">{user.fluent}</p>
+      <p className="text-lg font-semibold truncate">{UppercaseVar(user.fluent)}</p>
       <p className="text-xs tracking-wide truncate">FLUENT IN</p>
     </div>
 
     {/* Middle Box - Practicing */}
     <div className="flex flex-col items-center gap-1">
       <FiBookOpen size={30} className="text-blue-500"/>
-      <p className="text-lg font-semibold">{user.practice}</p>
-      <p className="text-xs text-gray-500">{user.proficiency}</p>
+      <p className="text-lg font-semibold">{UppercaseVar(user.practice)}</p>
+      
       <p className="text-xs tracking-wide">PRACTICING</p>
     </div>
 
     {/* Right Box - Country */}
     <div className="flex flex-col items-center gap-1">
       <FiGlobe size={30} className="text-green-700"/>
-      <p className="text-lg font-semibold truncate">{user.country}</p>
+      <p className="text-lg font-semibold truncate">{UppercaseVar(user.country)}</p>
       <p className="text-xs tracking-wide truncate">COUNTRY</p>
     </div>
     

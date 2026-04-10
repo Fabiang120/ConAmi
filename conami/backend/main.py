@@ -118,10 +118,6 @@ class ConversationWithMessages(SQLModel):
 database_url = os.getenv("DATABASE_URL")
 engine = create_engine(database_url)
 
-@app.on_event("startup")
-def on_startup():
-    SQLModel.metadata.create_all(engine)
-
 # with creates session with database url puts that into session and then gets called but pauses due to yield session
 # We use yield here instead of return to maintain session open for methods when they call this
 def get_session():
@@ -254,6 +250,7 @@ def get_profile(session: SessionDep, username: Annotated[str, Depends(get_userna
         "username": profile.username,
         "email": profile.email,
         "gender": profile.gender,
+        "age": profile.age,
         "country": profile.country,
         "fluent": profile.fluent,
         "practice": profile.practice,
