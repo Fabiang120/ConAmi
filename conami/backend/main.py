@@ -53,6 +53,27 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 120
 class User(SQLModel, table=True):
     username: str = Field(primary_key=True)
     password: str
+    email: str | None = Field(default=None, unique=True)
+    is_banned: bool = Field(default=False)
+
+class BlockedUser(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    blocker_username: str = Field(foreign_key="user.username")
+    blocked_username: str = Field(foreign_key="user.username")
+
+class UsersReported(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    reporter_username: str = Field(foreign_key="user.username")
+    reported_username: str = Field(foreign_key="user.username")
+    reason: str
+    created_at : datetime = Field(default_factory=datetime.utcnow)
+
+class SupportTicket(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(foreign_key="user.username")
+    message: str
+    is_resolved: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Profile(SQLModel, table=True):
     username: str = Field(primary_key=True, foreign_key="user.username")
@@ -123,17 +144,20 @@ def get_username_from_cookie(
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-def check_regexes(username: str, password:str):
-    if not USERNAME_REGEX.fullmatch(username):
-        raise HTTPException(
-            status_code=400,
-            detail="Username must be 8-40 characters and only contain letters, numbers and underscores"
-        )
-    if not PASSWORD_REGEX.fullmatch(password):
-        raise HTTPException(
-            status_code=400,
-            detail="Password must be 8-40 characters and include 1 uppercase letter, 1 number, and 1 special character"
-        )
+def check_regexes(username: str | None = None, password: str | None = None):
+    if username is not None:
+        if not USERNAME_REGEX.fullmatch(username):
+            raise HTTPException(
+                status_code=400,
+                detail="Username must be 8-40 characters and only contain letters, numbers and underscores"
+            )
+            
+    if password is not None:
+        if not PASSWORD_REGEX.fullmatch(password):
+            raise HTTPException(
+                status_code=400,
+                detail="Password must be 8-40 characters and include 1 uppercase letter, 1 number, and 1 special character"
+            )
 
 # Creates JWT access token with secret key called by Login and SignUp
 def create_access_token(username: str):
@@ -246,9 +270,14 @@ def login(
     request: Request
 ) -> dict:
     check_regexes(form_data.username,form_data.password)
+
     user = session.get(User, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # Ban check
+    if user.is_banned:
+        raise HTTPException(status_code=403, detail="User is banned")
 
     set_auth_cookie(response, user.username)
     return {"ok": True}
@@ -290,8 +319,8 @@ def create_conversation(
 # MIGHT GET RID OF !!!!
 @app.get("/conversations")
 def get_conversations(session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]) -> list[Conversations]:
-    user1 = conversations.user1
-    user2 = conversations.user2
+    user1 = Conversations.user1
+    user2 = Conversations.user2
     conversations = session.exec(select(Conversations).where(
         (user1 ==username) | (user2 == username)
         )
@@ -318,11 +347,16 @@ def send_message(
     username: Annotated[str, Depends(get_username_from_cookie)],
     content: str = Body(...)
     ) -> Message:
+    sender = session.get(User, username)
+    if sender and sender.is_banned:
+        raise HTTPException(status_code=403, detail="You are banned and cannot send messages")
+    
     conversation = session.get(Conversations, conversation_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
     if username != conversation.user1 and username != conversation.user2:
         raise HTTPException(status_code=403, detail="Not a participant in this conversation")
+    
     new_message = Message(conversation_id=conversation_id, sender_username=username, content=content)
     session.add(new_message)
     session.commit()
@@ -351,22 +385,180 @@ def get_conversations_with_messages(
         ))
     return result
 
-# Language learning, country, gender, language spoken, profile picture (possibly create user info table) post and get
+# Language learning, country, gender, language spoken, (possibly create user info table) post and get
 
-# Search Blocked Users Route
+#Profile Picture Upload Route 
 
 # Post Blocked Users Route
+@app.post("/users/block/{username_typed}")
+def block_user(
+    username_typed: Annotated[str, Path(min_length=8, max_length=40)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> BlockedUser:
+    #Prevent users from blocking themselves
+    if username == username_typed:
+        raise HTTPException(status_code=400, detail="You cannot block yourself")
+
+    # Check if the user they are trying to block actually exists
+    user_to_block = session.get(User, username_typed)
+    if user_to_block is None:
+        raise HTTPException(status_code=404, detail="User to block not found")
+
+    # Check if the block already exists so we don't create duplicate rows
+    existing_block = session.exec(
+        select(BlockedUser).where(
+            (BlockedUser.blocker_username == username) & 
+            (BlockedUser.blocked_username == username_typed)
+        )
+    ).first()
+    
+    if existing_block:
+        raise HTTPException(status_code=400, detail="User is already blocked")
+
+    # If all checks pass, create the block
+    new_block = BlockedUser(blocker_username=username, blocked_username=username_typed)
+    session.add(new_block)
+    session.commit()
+    session.refresh(new_block)
+    
+    return new_block
 
 # Get Blocked Users Route - new db table
+@app.get("/users/blocked")
+def get_blocked_users(
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> list[str]:
+    blocked_users = session.exec(
+        select(BlockedUser.blocked_username).where(BlockedUser.blocker_username == username)
+    ).all()
+    return blocked_users
+
 
 # Update Username Route
+@app.put("/users/update-username")
+def update_username(
+    new_username: Annotated[str, Body(..., embed=True)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+    # Only validate the username
+    check_regexes(username=new_username) 
+    
+    user = session.get(User, username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    existing_user = session.get(User, new_username)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    user.username = new_username
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return {"ok": True}
 
 # Update Password Route
+@app.put("/users/update-password")
+def update_password(
+    new_password: Annotated[str,Body(...,embed=True)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+    # Only validate the password
+    check_regexes(password=new_password) 
+    
+    user = session.get(User, username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    user.password = pwd_context.hash(new_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    
+    return {"ok": True}
+
 
 # Update Email Route - Would need to add email to database
+@app.put("/users/update-email")
+def update_email(
+    new_email: Annotated[str, Body(..., embed=True)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+    user = session.get(User, username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if the new email is already in use by another user
+    existing_user = session.exec(select(User).where(User.email == new_email)).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already in use")
 
-# Update 2FA - set up lastly if possible
+    user.email = new_email
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return {"ok": True}
 
 # Post Report Users - possibly on first offense show message and on third ban
+@app.post("/users/report/{reported_username}")
+def report_user(
+    reported_username: Annotated[str, Path(min_length=8, max_length=40)],
+    reason: Annotated[str, Body(..., embed=True)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+
+    if username == reported_username:
+        raise HTTPException(status_code=400, detail="You cannot report yourself")
+
+    user_to_report = session.get(User, reported_username)
+    if user_to_report is None:
+        raise HTTPException(status_code=404, detail="User to report not found")
+
+    existing_report = session.exec(
+        select(UsersReported).where(
+            (UsersReported.reporter_username == username) & 
+            (UsersReported.reported_username == reported_username)
+        )
+    ).first()
+    
+    if existing_report:
+        raise HTTPException(status_code=400, detail="You have already reported this user")
+    new_report = UsersReported(reporter_username=username, reported_username=reported_username, reason=reason)
+    session.add(new_report)
+    session.commit()
+    session.refresh(new_report)
+    total_reports = len(session.exec(
+        select(UsersReported).where(UsersReported.reported_username == reported_username).all())
+    )
+    if total_reports >= 3:
+        user_to_report.is_banned = True
+        session.add(user_to_report)
+        session.commit()
+        session.refresh(user_to_report)
+    
+    return {"message" : "Report submitted succesfully."}
+
 
 # Post support chat textbox 
+@app.post("/support/message")
+def submit_support_message(
+    message: Annotated[str, Body(..., embed=True)],
+    session: SessionDep,
+    username: Annotated[str, Depends(get_username_from_cookie)]
+) -> dict:
+    support_ticket = SupportTicket(username=username, message=message)
+    session.add(support_ticket)
+    session.commit()
+    session.refresh(support_ticket)
+    return {"message": "Support message submitted successfully."}
+
+
+# Update 2FA - set up lastly if possible - last edition

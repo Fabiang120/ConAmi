@@ -61,12 +61,14 @@ function AppearanceSection() {
     const [darkMode, setDarkMode] = useState(false);
     const [fontSize, setFontSize] = useState("medium");
     return (
-        <div>
-            <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Appearance Settings</h2>
-            <p className="text-[1rem] font-normal leading-6">Customize the way ConAmi looks and feels for you.</p>
-            <div className="flex flex-col lg:flex-row md:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-24">
+        <div className="flex flex-col items-center md:items-stretch w-full">
+            <div className="flex flex-col justify-center items-center lg:items-start">
+                <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Appearance Settings</h2>
+                <p className="text-[1rem] font-normal leading-6">Customize the way ConAmi looks and feels for you.</p>
+            </div>
+            <div className="flex flex-col lg:flex-row lg:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-40 w-full max-w-175 md:max-w-none">
                 <div className="flex justify-start items-center gap-4">
-                    <LuMoon className="text-[#63372c]" size={40} />
+                    <LuMoon className="text-[#63372c] shrink-0" size={40} />
                     <div>
                         <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Dark Mode</h3>
                         <p className="text-[1rem] font-normal leading-6">Switch between light and dark appearance.</p>
@@ -87,9 +89,9 @@ function AppearanceSection() {
                     </button>
                 </div>
             </div>
-            <div className="flex flex-col lg:flex-row md:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-24">
+            <div className="flex flex-col lg:flex-row lg:justify-between items-center gap-4 mt-5 bg-white/70 border-2 border-[#63372c] rounded-md px-2 py-2 md:h-40 w-full max-w-175 md:max-w-none">
                 <div className="flex justify-start items-center gap-4">
-                    <LuType className="text-[#63372c]" size={40} />
+                    <LuType className="text-[#63372c] shrink-0" size={40} />
                     <div>
                         <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Font Size</h3>
                         <p className="text-[1rem] font-normal leading-6">Adjust text size for preference</p>
@@ -137,7 +139,7 @@ function BlockedUsersSection() {
     ]);
     return (
         <div>
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
                 {/* This part will be on the top left of the main part */}
                 <div className="flex flex-col justify-center items-center md:items-start gap-4">
                     <h2 className="text-[2rem] font-semibold leading-tight text-center tracking-tight">Blocked Users List</h2>
@@ -154,7 +156,7 @@ function BlockedUsersSection() {
             </div>
             <p className="text-[1rem] font-normal leading-6 mt-5">Total Blocked: {blockedUsers.length} </p>
             {/* This part will be below the top part and will be a list of blocked users */}
-            <div className="grid md:grid-cols-4 gap-4 mt-5 ">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5 ">
                 {blockedUsers.map((user) => (
                     <div
                         key={user.id}
@@ -193,8 +195,8 @@ function LoginDetailsSection() {
                     <h2 className="text-[2rem] font-semibold leading-tight tracking-tight text-center md:text-start">Login Details Management</h2>
                     <p className="text-[1rem] font-normal leading-6 text-center md:text-start">Update and manage your primary account security settings</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 justify-items-center md:w-full md:justify-items-stretch">
-                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
+                <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 justify-items-center w-full gap-5">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuUser className="text-[#63372c]" size={50} />
                             <div>
@@ -205,7 +207,7 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Username</button>
                     </div>
 
-                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuKeyRound className="text-[#63372c]" size={50} />
                             <div>
@@ -216,7 +218,7 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Update Password</button>
                     </div>
 
-                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuMail className="text-[#63372c]" size={50} />
                             <div>
@@ -227,7 +229,7 @@ function LoginDetailsSection() {
                         <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Email</button>
                     </div>
 
-                    <div className="inline-flex md:flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 mt-5 gap-4 w-50 md:w-full min-h-25">
+                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
                         <div className="flex justify-start items-center gap-4">
                             <LuShieldCheck className="text-[#63372c]" size={50} />
                             <div>
@@ -247,11 +249,13 @@ function LoginDetailsSection() {
 
 function HelpCenterSection() {
     return(
-        <div>
-            <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Get The Support You Need!</h2>
-            <p className="text-[1rem] font-normal leading-6">We're here to help you with any questions or issues you may have.</p>
-            <div className="flex flex-row items-start justify-center rounded-md gap-10 mt-10">
-                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md px-5 py-10">
+        <div className="flex flex-col justify-center items-center xl:items-start">
+            <div>
+                <h2 className="text-[2rem] font-semibold leading-tight tracking-tight">Get The Support You Need!</h2>
+                <p className="text-[1rem] font-normal leading-6">We're here to help you with any questions or issues you may have.</p>
+            </div>
+            <div className="flex flex-col xl:flex-row items-start justify-center rounded-md gap-10 mt-10">
+                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md w-120 md:px-5 py-10">
                     <LuTriangleAlert className="text-[#63372c]" size={50} />
                     <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Report a User</h3>
                     <p className="text-[1rem] font-normal leading-6">Search for a username to submit a Behavioral Report.</p>
@@ -264,11 +268,11 @@ function HelpCenterSection() {
                         <button className="px-4 py-2 bg-[#63372c] text-white rounded-md text-sm font-medium">Send Message</button>
                     </div>
                 </div>
-                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md px-10 py-15">
+                <div className="flex flex-col justify-center items-center bg-white/70 border-2 border-[#63372c] rounded-md w-120 px-10 py-15">
                     <RiCustomerService2Line className="text-[#63372c]" size={50} />
                     <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Chat with Support</h3>
                     <p className="text-[1rem] font-normal leading-6 mt-2">Send a message to our support team for assistance.</p>
-                    <div className="mt-8 w-full max-w-[28rem]">
+                    <div className="mt-8 w-full max-w-md">
                         <textarea
                             placeholder="How can we assist you?"
                             className="w-full h-32 rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal resize-none"
