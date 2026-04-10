@@ -10,30 +10,33 @@ export default function EditProfile() {
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
     const [gender, setGender] = useState("");
+    const [age, setAge] = useState("");
     const [LanguageSpoken, setLanguageSpoken] = useState("");
 
     const router = useRouter();
     const handleSave = async () => {
-        const res = await fetch("http://localhost:8000/profile", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                username,
-                email,
-                language,
-                country,
-                gender,
-                fluent: LanguageSpoken
-            }),
-        });
-        if(!res.ok){
-            alert("Failed to save profile");
-            return;
+        try{
+            const res = await fetch("http://localhost:8000/profile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    fluent: LanguageSpoken,
+                    country: country,
+                    gender: gender,
+                    practice: language,
+                }),
+            });
+            if(!res.ok){
+                throw new Error("Failed to save profile");
+            }
+            router.push("/Profile/User-View");
+        }catch (err) {
+            console.error(err);
         }
-        router.push("/Home");
+
     }
     
     return (
@@ -111,6 +114,13 @@ export default function EditProfile() {
                             <option value="male">Male</option>
                             <option value="other">Other</option>
                         </select>
+                        <input
+                            type="text"
+                            placeholder="Age"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
+                        />
                     </div>
                     <div className="flex justify-center">
                         <button 

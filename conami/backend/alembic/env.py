@@ -18,7 +18,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from main import SQLModel
+from main import SQLModel, User, Profile, Conversations, Message
 target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,

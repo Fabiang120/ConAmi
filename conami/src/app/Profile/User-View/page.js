@@ -23,30 +23,78 @@ export default function ProfileView() {
           credentials: "include"
          });
          if(!userRes.ok) throw new Error("Failed to fetch user");
-         const realUser = await userRes.json();
-         setUser(realUser);
+         const userData = await userRes.json();
+
+         let profileData = {};
+          
+        const profileRes = await fetch("http://localhost:8000/profile", {
+          credentials: "include",
+         });
+
+         if(profileRes.ok){
+          profileData = await profileRes.json();
+         }
+         setUser({
+          ...userData,
+          ...profileData,
+         });
+
+         if(profileData?.image){
+          setImage(profileData.image);
+         }
+
        } catch (err){
          console.error(err);
        }
      };
+
      fetchUser();
    }, []);
+
     if(!user) return <div>Loading...</div>;
 //clicking
    const handlePlusClick = () =>{
     fileInputRef.current.click();
    };
 
-   const handleFileChange = (e) => {
+   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if(!file) return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Profile_Images");
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result);
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dwaj95bl4/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      const imageUrl = data.secure_url;
+      setImage(imageUrl);
+
+      setUser((prev) => ({
+            ...prev,
+      }));
+
+      await fetch("http://localhost:8000/profile", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type" : "application/json",
+        },
+        body: JSON.stringify({
+          image: imageUrl,
+        }),
+      });
+    } catch (err){
+      console.error("image uplaod failed:", err);
+    }
     };
-    reader.readAsDataURL(file);
-   }
     
     return (
             <div className="grid grid-cols-12 min-h-screen">
