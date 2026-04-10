@@ -272,7 +272,7 @@ function HelpCenterSection() {
                     <RiCustomerService2Line className="text-[#63372c]" size={50} />
                     <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">Chat with Support</h3>
                     <p className="text-[1rem] font-normal leading-6 mt-2">Send a message to our support team for assistance.</p>
-                    <div className="mt-8 w-full max-w-[28rem]">
+                    <div className="mt-8 w-full max-w-md">
                         <textarea
                             placeholder="How can we assist you?"
                             className="w-full h-32 rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal resize-none"
