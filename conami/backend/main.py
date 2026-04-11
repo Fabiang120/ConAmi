@@ -23,7 +23,8 @@ from slowapi.errors import RateLimitExceeded
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
 ]
 
 app.add_middleware(
@@ -175,6 +176,7 @@ def set_auth_cookie(response: Response, username: str) -> None:
 
 # SignUp API. route
 # SignUp API. route
+# Temporary Debug Mode
 @app.post("/users/")
 def create_user(user: User, session: SessionDep, response: Response):
     check_regexes(user.username, user.password)
