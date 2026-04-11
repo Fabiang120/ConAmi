@@ -289,7 +289,7 @@ def login(
 @app.post("/conversations")
 def create_conversation(
     session: SessionDep, 
-    username: Annotated[str, Depends(get_username_from_cookie)],
+    username: str = Query(...),
     # Added embed=True so it correctly parses the JSON object from React
     user2: str = Body(..., embed=True) 
 ) -> Conversations:
@@ -327,7 +327,7 @@ def create_conversation(
 # GET ALL CONVERSATIONS FOR A USER 
 # MIGHT GET RID OF !!!!
 @app.get("/conversations")
-def get_conversations(session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]) -> list[Conversations]:
+def get_conversations(session: SessionDep, username: str = Query(...)) -> list[Conversations]:
     user1 = Conversations.user1
     user2 = Conversations.user2
     conversations = session.exec(select(Conversations).where(
@@ -338,12 +338,10 @@ def get_conversations(session: SessionDep, username: Annotated[str, Depends(get_
 
 # GET ALL MESSAGES IN A CONVERSATION
 @app.get("/conversations/{conversation_id}/messages")
-def get_messages(conversation_id : int, session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]) -> list[Message]:
+def get_messages(conversation_id : int, session: SessionDep, username: str = Query(...)) -> list[Message]:
     conversation = session.get(Conversations, conversation_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
-    if username != conversation.user1 and username != conversation.user2:
-        raise HTTPException(status_code=403, detail="Not a participant in this conversation")
     messages = session.exec(select(Message).where(Message.conversation_id == conversation_id)
     ).all()
     return messages
@@ -363,9 +361,7 @@ def send_message(
     conversation = session.get(Conversations, conversation_id)
     if conversation is None:
         raise HTTPException(status_code=404, detail="Conversation not found")
-    if username != conversation.user1 and username != conversation.user2:
-        raise HTTPException(status_code=403, detail="Not a participant in this conversation")
-    
+   
     new_message = Message(conversation_id=conversation_id, sender_username=username, content=content)
     session.add(new_message)
     session.commit()
@@ -376,8 +372,9 @@ def send_message(
 # Will return conversation with messages list by querying results and messages
 @app.get("/conversations/full")
 def get_conversations_with_messages(
-    session: SessionDep, 
-    username: Annotated[str,Depends(get_username_from_cookie)]) -> list[ConversationWithMessages]:
+    session: SessionDep,
+    username: str = Query(...)
+) -> list[ConversationWithMessages]:
     conversations = session.exec(select(Conversations).where(
         (Conversations.user1 ==username) | (Conversations.user2 == username)
         )

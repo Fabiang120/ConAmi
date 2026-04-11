@@ -20,8 +20,9 @@ export default function ChatRoom() {
   const activeChat = chats.find(chat => chat.id === activeChatId);
 
   const fetchChats = useCallback(async () => {
+    if (!username) return;
     try {
-      const res = await fetch(`http://localhost:8000/conversations/full`, {
+      const res = await fetch(`http://localhost:8000/conversations/full?username=${encodeURIComponent(username)}`, {
         method: "GET",
         credentials: "include",
       });
@@ -69,7 +70,7 @@ export default function ChatRoom() {
         setActiveChatId(existingChat.id);
       } else {
         try {
-          const res = await fetch("http://localhost:8000/conversations", {
+          const res = await fetch(`http://localhost:8000/conversations?username=${encodeURIComponent(username)}`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -83,12 +84,13 @@ export default function ChatRoom() {
           }
         } catch (err) {
           console.error(err);
+          setError("Error starting conversation");
         }
       }
     };
 
     startConversation();
-  }, [targetUser, username, loading, fetchChats]);
+  }, [targetUser, username, loading, chats, fetchChats]);
 
   return (
     <div className="grid grid-cols-12 min-h-screen">
