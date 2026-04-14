@@ -102,7 +102,7 @@ export default function ProfileView() {
     };
     
     return (
-            <div className="grid grid-cols-12 min-h-screen">
+            <div className="grid grid-cols-12 min-h-screen bg-[#F5E6D3]">
       <div className="hidden md:block md:col-span-3 lg:col-span-2">
         <Sidebar />
       </div>

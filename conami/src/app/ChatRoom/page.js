@@ -91,19 +91,19 @@ export default function ChatRoom() {
   }, [targetUser, username, loading, fetchChats]);
 
   return (
-    <div className="grid grid-cols-12 min-h-screen">
+    <div className="grid grid-cols-12 h-screen bg-white overflow-hidden">
       <div className="hidden md:block md:col-span-3 lg:col-span-2">
         <Sidebar />
       </div>
-      <div className="col-span-12 md:col-span-9 lg:col-span-10 grid grid-cols-12 pb-16">
-        <div className="col-span-4 lg:col-span-3 border-r">
+      <div className="col-span-12 md:col-span-9 lg:col-span-10 grid grid-cols-12 pb-16 h-full min-h-0">
+        <div className="col-span-4 lg:col-span-3 border-r h-full min-h-0">
           <ChatList
             chats={chats}
             setActiveChatId={setActiveChatId}
             activeChatId={activeChatId}
           />
         </div>
-        <div className="col-span-8 lg:col-span-9">
+        <div className="col-span-8 lg:col-span-9 h-full min-h-0">
           <ChatWindow
             activeChat={activeChat}
             setChats={setChats}
