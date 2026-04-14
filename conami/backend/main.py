@@ -23,7 +23,10 @@ from slowapi.errors import RateLimitExceeded
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://con-ami.com",
+    "https://www.con-ami.com",
+    "https://conami-iota.vercel.app",
 ]
 
 app.add_middleware(
