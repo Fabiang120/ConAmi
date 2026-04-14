@@ -1,14 +1,14 @@
 {
-    "builds": [
-        {
-            "src": "api/index.py",
-            "use": "@vercel/python"
+    "experimentalServices": {
+        "frontend": {
+            "entrypoint": ".",
+            "routePrefix": "/",
+            "framework": "nextjs"
+        },
+        "backend": {
+            "entrypoint": "api/main.py",
+            "routePrefix": "/api",
+            "framework": "fastapi"
         }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/index.py"
-        }
-    ]
+    }
 }
