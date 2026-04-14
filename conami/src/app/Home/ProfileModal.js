@@ -1,10 +1,25 @@
+"use client";
 import { FiMessageSquare } from "react-icons/fi";
 import { useRouter } from 'next/navigation.js';
 
 export function ProfileModal({ profile, onClose }) {
   if (!profile) return null;
   const router = useRouter();
-
+  const startConversation = async (profileUsername) => {
+    try {
+      const res = await fetch("http://localhost:8000/conversations", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user2: profileUsername }),
+      });
+      if (!res.ok) throw new Error("Failed to start conversation");
+      const data = await res.json();
+      router.push(`/ChatRoom/${data.id}`);
+    } catch (err) {
+      console.error("Error starting conversation:", err);
+    }
+  };
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50"
@@ -54,7 +69,7 @@ export function ProfileModal({ profile, onClose }) {
             onClick={(e) => {
               e.stopPropagation();
               onClose();
-              router.push(`/ChatRoom?user=${profile.username}`);
+              startConversation(profile.username);
             }}
           >
             Start Chatting! <FiMessageSquare />
