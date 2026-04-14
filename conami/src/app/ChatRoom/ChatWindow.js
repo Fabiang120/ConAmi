@@ -46,7 +46,7 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
 
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: "smooth"});
-  }, [activeChat]);
+  }, [activeChat?.messages.length]);
 
   if(!activeChat){
     return (
