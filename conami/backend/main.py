@@ -173,24 +173,26 @@ def set_auth_cookie(response: Response, username: str) -> None:
         path="/",
     )
 
-# SignUp API. route
-# SignUp API. route
 @app.post("/users/")
 def create_user(user: User, session: SessionDep, response: Response) -> dict:
     check_regexes(user.username, user.password)
     user.password = pwd_context.hash(user.password)
-    session.add(user)
-    new_profile = Profile(username=user.username)
-    session.add(new_profile)
-    
+
     try:
+        session.add(user)
         session.commit()
         session.refresh(user)
+
+        new_profile = Profile(username=user.username)
+        session.add(new_profile)
+        session.commit()
+
         set_auth_cookie(response, user.username)
         return {"ok": True}
-    except IntegrityError:
+
+    except IntegrityError as e:
         session.rollback()
-        raise HTTPException(status_code=400, detail="Username already exists")
+        raise HTTPException(status_code=400, detail=str(e))
 
 # This function decodes JWT, extracts username from sub, and returns full user object 
 @app.get("/auth/me")
