@@ -176,7 +176,7 @@ def set_auth_cookie(response: Response, username: str) -> None:
         path="/",
     )
 
-@app.post("/users/")
+@app.post("/users")
 def create_user(user: User, session: SessionDep, response: Response) -> dict:
     check_regexes(user.username, user.password)
     user.password = pwd_context.hash(user.password)
@@ -208,7 +208,7 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="User not found")
     return {"username": user.username}
 
-@app.get("/users/")
+@app.get("/users")
 def get_users(session: SessionDep) -> list[Profile]:
     # Select from the Profile table so we get age, fluent, country, etc.
     profiles = session.exec(select(Profile)).all()

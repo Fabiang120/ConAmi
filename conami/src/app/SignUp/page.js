@@ -12,7 +12,7 @@ export default function SignUp() {
     const [error, setError] = React.useState("");
     const router = useRouter();
     const {refreshUser} = useAuth();
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
@@ -20,7 +20,7 @@ export default function SignUp() {
             return;
         }
         // First signs in user by checking password / username
-        const res = await fetch("http://localhost:8000/users/", {
+        const res = await fetch(`${API_BASE}/users`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

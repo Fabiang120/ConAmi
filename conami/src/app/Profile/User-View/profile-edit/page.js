@@ -8,9 +8,9 @@ export default function EditProfile() {
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
     const [gender, setGender] = useState("");
-    const [age, setAge] = useState(null);
+    const [age, setAge] = useState("");
     const [LanguageSpoken, setLanguageSpoken] = useState("");
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const router = useRouter();
     const handleSave = async () => {
         try{
@@ -22,9 +22,9 @@ export default function EditProfile() {
             if(country) payload.country = country;
             if(gender) payload.gender = gender;
             if(language) payload.practice = language;
-            if (age !== null) payload.age = age;
+            if (age !== "") payload.age = age;
 
-            const res = await fetch("http://localhost:8000/profile", {
+            const res = await fetch(`${API_BASE}/profile`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function EditProfile() {
     useEffect(() => {
     const loadProfile = async () => {
         try {
-            const res = await fetch("http://localhost:8000/profile", {
+            const res = await fetch(`${API_BASE}/profile`, {
                 credentials: "include",
             });
 
@@ -144,7 +144,7 @@ export default function EditProfile() {
                         <input
                             type="number"
                             placeholder="Age"
-                            value={age}
+                            value={age ?? ""}
                             onChange={(e) => setAge(e.target.value === "" ? null : Number(e.target.value))}
                             className="px-4 py-2 rounded-md border border-gray-400 bg-white  focus:outline-none focus:ring-2 focus:ring-brown-400"
                         />

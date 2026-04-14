@@ -13,12 +13,12 @@ export default function ChatRoom() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const { username } = useAuth();
-
+    
     const activeChat = chats.find(chat => chat.id === activeChatId);
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const fetchChats = useCallback(async () => {
         try {
-            const res = await fetch("http://localhost:8000/conversations/full", {
+            const res = await fetch(`${API_BASE}/conversations/full`, {
                 method: "GET",
                 credentials: "include",
             });

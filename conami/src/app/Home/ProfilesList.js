@@ -9,9 +9,10 @@ export default function ProfilesList() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const router = useRouter();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
   const startConversation = async(profileUsername) => {
     try{
-      const res = await fetch("http://localhost:8000/conversations", {
+      const res = await fetch(`${API_BASE}/conversations`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -26,17 +27,17 @@ export default function ProfilesList() {
   };
   useEffect(() => {
     let mounted = true;
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const load = async () => {
       try {
-        const meRes = await fetch("http://localhost:8000/auth/me", {
+        const meRes = await fetch(`${API_BASE}/auth/me`, {
           credentials: "include",
         });
         if (!meRes.ok) return;
         const meData = await meRes.json();
         const myUsername = meData.username;
 
-        const userRes = await fetch("http://localhost:8000/users/", {
+        const userRes = await fetch(`${API_BASE}/users`, {
           credentials: "include",
         });
         if (!userRes.ok) throw new Error("Network error");
