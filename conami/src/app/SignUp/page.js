@@ -29,8 +29,10 @@ export default function SignUp() {
             body: JSON.stringify({ username, password })
         });
 
+        const data = await res.json();
+
         if (!res.ok) {
-            setError("Failed to create account. Username may already be taken.");
+            setError(data.detail || "Failed to create account.");
             return;
         }
         await refreshUser();
