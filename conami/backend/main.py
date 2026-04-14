@@ -53,9 +53,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 120
 
-print("DATABASE_URL:", os.getenv("DATABASE_URL"))
-print("SECRET_KEY:", os.getenv("SECRET_KEY"))
-
 class User(SQLModel, table=True):
     username: str = Field(primary_key=True)
     password: str
