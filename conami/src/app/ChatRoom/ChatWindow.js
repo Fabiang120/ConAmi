@@ -8,10 +8,11 @@ export default function ChatWindow({activeChat, setChats, setActiveChatId}) {
   const {username} = useAuth();
   const messagesEnd = useRef(null);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
   const handleSend = async () => {
     if(!input.trim()) return;
     const contentToSend = input;
-    const res = await fetch(`http://localhost:8000/conversations/${activeChat.id}/messages`, {
+    const res = await fetch(`${API_BASE}/conversations/${activeChat.id}/messages`, {
       method: "POST",
       credentials: "include",
       headers: {

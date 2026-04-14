@@ -16,7 +16,7 @@ export default function Profile() {
     const router = useRouter();
     const handleSave = async () => {
         console.log("SAVE CLICKED");
-        const res = await fetch("http://localhost:8000/profile", {
+        const res = await fetch("api/profile", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

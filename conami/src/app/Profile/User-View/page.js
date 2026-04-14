@@ -11,7 +11,7 @@ export default function ProfileView() {
   const router = useRouter();
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
-
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
   const UppercaseVar = (str) => {
     if(!str) return "-"
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -24,7 +24,7 @@ export default function ProfileView() {
    useEffect(() => {
      const fetchUser =async () => {
        try{
-        const userRes = await fetch("http://localhost:8000/auth/me", {
+        const userRes = await fetch(`${API_BASE}/auth/me`, {
           credentials: "include"
          });
          if(!userRes.ok) throw new Error("Failed to fetch user");
@@ -32,7 +32,7 @@ export default function ProfileView() {
 
          let profileData = {};
           
-        const profileRes = await fetch("http://localhost:8000/profile", {
+        const profileRes = await fetch(`${API_BASE}/profile`, {
           credentials: "include",
          });
 
@@ -86,7 +86,7 @@ export default function ProfileView() {
             ...prev,
       }));
 
-      await fetch("http://localhost:8000/profile", {
+      await fetch(`${API_BASE}/profile`, {
         method: "POST",
         credentials: "include",
         headers: {

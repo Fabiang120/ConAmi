@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation.js';
 export function ProfileModal({ profile, onClose }) {
   if (!profile) return null;
   const router = useRouter();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
   const startConversation = async (profileUsername) => {
     try {
-      const res = await fetch("http://localhost:8000/conversations", {
+      const res = await fetch(`${API_BASE}/conversations`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

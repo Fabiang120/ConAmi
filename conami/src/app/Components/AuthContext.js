@@ -5,10 +5,10 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [username, setUsername] = useState(null);
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const refreshUser = async () => {
         try {
-            const res = await fetch("http://localhost:8000/auth/me", {
+            const res = await fetch(`${API_BASE}/auth/me`, {
                 method: "GET",
                 credentials: "include",
             });
@@ -28,7 +28,8 @@ export function AuthProvider({ children }) {
     };
 
     const login = async (formData) => {
-        const res = await fetch("http://localhost:8000/token", {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+        const res = await fetch(`${API_BASE}/token`, {
             method: "POST",
             body: formData,
             credentials: "include",
@@ -43,8 +44,9 @@ export function AuthProvider({ children }) {
     };
 
     const logout = async () => {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
         try {
-            await fetch("http://localhost:8000/logout", {
+            await fetch(`${API_BASE}/logout`, {
                 method: "POST",
                 credentials: "include",
             });

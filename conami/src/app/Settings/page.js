@@ -121,11 +121,11 @@ function BlockedUsersSection() {
     const [blockedUsers, setBlockedUsers] = useState([]);
     const [PersonToBlock, setPersonToBlock] = useState("");
     const [error, setError] = useState(null);
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     useEffect(() => {
         const getBlockedUsers = async () => {
             try {
-                const res = await fetch("http://localhost:8000/users/blocked", {
+                const res = await fetch(`${API_BASE}/users/blocked`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -152,7 +152,7 @@ function BlockedUsersSection() {
         e.preventDefault();
         if (!PersonToBlock.trim()) return;
         try {
-            const res = await fetch("http://localhost:8000/users/block/" + PersonToBlock, {
+            const res = await fetch(`${API_BASE}/users/block/` + PersonToBlock, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -301,13 +301,13 @@ function HelpCenterSection() {
     const [MessageToSupport, setMessageToSupport] = useState("");
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
     const ReportUser = async (e) => {
         e.preventDefault();
         if (!PersonToReport.trim()) return;
 
         try {
-            const res = await fetch("http://localhost:8000/users/report/" + PersonToReport, {
+            const res = await fetch(`${API_BASE}/users/report/` + PersonToReport, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -339,7 +339,7 @@ function HelpCenterSection() {
         if (!MessageToSupport.trim()) return;
 
         try {
-            const res = await fetch("http://localhost:8000/support/message", {
+            const res = await fetch(`${API_BASE}/support/message`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
