@@ -6,112 +6,86 @@ import React, { useEffect, useState, useCallback } from "react";
 import ChatWindow from './ChatWindow';
 import ChatList from './ChatList';
 import { useAuth } from "../Components/AuthContext";
-import { useSearchParams } from 'next/navigation.js';
 
 export default function ChatRoom() {
-  const [chats, setChats] = useState([]);
-  const [activeChatId, setActiveChatId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const { username } = useAuth();
-  const searchParams = useSearchParams();
-  const targetUser = searchParams.get("user");
+    const [chats, setChats] = useState([]);
+    const [activeChatId, setActiveChatId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const { username } = useAuth();
 
-  const activeChat = chats.find(chat => chat.id === activeChatId);
+    const activeChat = chats.find(chat => chat.id === activeChatId);
 
-  const fetchChats = useCallback(async () => {
-    try {
-      const res = await fetch(`http://localhost:8000/conversations/full`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to get conversations");
-
-      const data = await res.json();
-      const formattedchats = data.map(conversation_message => ({
-        id: conversation_message.id,
-        name: (conversation_message.user1 !== username) ? conversation_message.user1 : conversation_message.user2,
-        messages: conversation_message.messages.map(msg => ({
-          id: msg.id,
-          username: msg.sender_username,
-          content: msg.content,
-          timestamp: new Date(msg.created_at).toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit",
-          }),
-        })),
-      }));
-      setChats(formattedchats);
-      setLoading(false);
-      return formattedchats;
-    } catch (err) {
-      setError("Error loading chats");
-      setLoading(false);
-      return [];
-    }
-  }, [username]);
-
-  useEffect(() => {
-    if (!username) return;
-    fetchChats();
-    const interval = setInterval(() => {
-      fetchChats();
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [username, fetchChats]);
-
-  useEffect(() => {
-    if (!targetUser || !username || loading) return;
-
-    const startConversation = async () => {
-      const existingChat = chats.find(chat => chat.name === targetUser);
-      if (existingChat) {
-        setActiveChatId(existingChat.id);
-      } else {
+    const fetchChats = useCallback(async () => {
         try {
-          const res = await fetch("http://localhost:8000/conversations", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user2: targetUser })
-          });
+            const res = await fetch("http://localhost:8000/conversations/full", {
+                method: "GET",
+                credentials: "include",
+            });
+            if (!res.ok) throw new Error("Failed to get conversations");
 
-          if (res.ok) {
-            const newConvo = await res.json();
-            await fetchChats();
-            setActiveChatId(newConvo.id);
-          }
+            const data = await res.json();
+            const formattedChats = data.map((conversation_message) => ({
+                id: conversation_message.id,
+                name:
+                    conversation_message.user1 !== username
+                        ? conversation_message.user1
+                        : conversation_message.user2,
+                messages: conversation_message.messages.map((msg) => ({
+                    id: msg.id,
+                    username: msg.sender_username,
+                    content: msg.content,
+                    timestamp: new Date(msg.created_at).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                    }),
+                })),
+            }));
+
+            setChats(formattedChats);
+            setLoading(false);
         } catch (err) {
-          console.error(err);
+            setError("Error loading chats");
+            setLoading(false);
         }
-      }
-    };
+    }, [username]);
 
-    startConversation();
-  }, [targetUser, username, loading, fetchChats]);
+    useEffect(() => {
+        if (!username) return;
+        fetchChats();
 
-  return (
-    <div className="grid grid-cols-12 h-screen bg-white overflow-hidden">
-      <div className="hidden md:block md:col-span-3 lg:col-span-2">
-        <Sidebar />
-      </div>
-      <div className="col-span-12 md:col-span-9 lg:col-span-10 grid grid-cols-12 pb-16 h-full min-h-0">
-        <div className="col-span-4 lg:col-span-3 border-r h-full min-h-0">
-          <ChatList
-            chats={chats}
-            setActiveChatId={setActiveChatId}
-            activeChatId={activeChatId}
-          />
+        const interval = setInterval(() => {
+            fetchChats();
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [username, fetchChats]);
+
+    return (
+        <div className="grid grid-cols-12 h-screen bg-white overflow-hidden">
+            <div className="hidden md:block md:col-span-3 lg:col-span-2">
+                <Sidebar />
+            </div>
+
+            <div className="col-span-12 md:col-span-9 lg:col-span-10 grid grid-cols-12 pb-16 h-full min-h-0">
+                <div className="col-span-4 lg:col-span-3 border-r h-full min-h-0">
+                    <ChatList
+                        chats={chats}
+                        setActiveChatId={setActiveChatId}
+                        activeChatId={activeChatId}
+                    />
+                </div>
+
+                <div className="col-span-8 lg:col-span-9 h-full min-h-0">
+                    <ChatWindow
+                        activeChat={activeChat}
+                        setChats={setChats}
+                        setActiveChatId={setActiveChatId}
+                    />
+                </div>
+            </div>
+
+            <BottomNav />
         </div>
-        <div className="col-span-8 lg:col-span-9 h-full min-h-0">
-          <ChatWindow
-            activeChat={activeChat}
-            setChats={setChats}
-            setActiveChatId={setActiveChatId}
-          />
-        </div>
-      </div>
-      <BottomNav />
-    </div>
-  );
+    );
 }

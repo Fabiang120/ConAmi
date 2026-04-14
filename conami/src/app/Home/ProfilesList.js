@@ -9,7 +9,21 @@ export default function ProfilesList() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const router = useRouter();
-
+  const startConversation = async(profileUsername) => {
+    try{
+      const res = await fetch("http://localhost:8000/conversations", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user2: profileUsername }),
+      });
+      if (!res.ok) throw new Error("Failed to start conversation");
+      const data = await res.json();
+      router.push(`/ChatRoom/${data.id}`);
+    } catch(err){
+      console.error("Error starting conversation:", err);
+    }
+  };
   useEffect(() => {
     let mounted = true;
 
@@ -90,7 +104,7 @@ export default function ProfilesList() {
                 className="flex text-3xl mt-6 cursor-pointer text-[#63372C] hover:scale-110 transition-transform"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/ChatRoom?user=${profile.username}`);
+                  startConversation(profile.username);
                 }}
               >
                 <FiMessageSquare />
