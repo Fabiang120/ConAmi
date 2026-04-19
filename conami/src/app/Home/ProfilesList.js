@@ -3,15 +3,18 @@ import React, { useEffect, useState } from "react";
 import { ProfileModal } from "./ProfileModal";
 import { FiMessageSquare } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Components/AuthContext";
 
 export default function ProfilesList() {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const { username } = useAuth();
   const router = useRouter();
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
-  const startConversation = async(profileUsername) => {
-    try{
+
+  const startConversation = async (profileUsername) => {
+    try {
       const res = await fetch(`${API_BASE}/conversations`, {
         method: "POST",
         credentials: "include",
@@ -21,31 +24,28 @@ export default function ProfilesList() {
       if (!res.ok) throw new Error("Failed to start conversation");
       const data = await res.json();
       router.push(`/ChatRoom/${data.id}`);
-    } catch(err){
+    } catch (err) {
       console.error("Error starting conversation:", err);
     }
   };
+
   useEffect(() => {
+    if (!username) return;
+
     let mounted = true;
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
-    const load = async () => {
+
+    const loadUsers = async () => {
       try {
-        const meRes = await fetch(`${API_BASE}/auth/me`, {
+        const res = await fetch(`${API_BASE}/users`, {
           credentials: "include",
         });
-        if (!meRes.ok) return;
-        const meData = await meRes.json();
-        const myUsername = meData.username;
 
-        const userRes = await fetch(`${API_BASE}/users`, {
-          credentials: "include",
-        });
-        if (!userRes.ok) throw new Error("Network error");
+        if (!res.ok) throw new Error("Failed to fetch users");
 
-        const users = await userRes.json();
+        const users = await res.json();
 
         if (mounted) {
-          setProfiles(users.filter(p => p.username !== myUsername));
+          setProfiles(users.filter((p) => p.username !== username));
           setLoading(false);
         }
       } catch (err) {
@@ -53,17 +53,17 @@ export default function ProfilesList() {
       }
     };
 
-    load();
+    loadUsers();
 
-    const interval = setInterval(() => {
-      load();
+    const intervalId = setInterval(() => {
+      loadUsers();
     }, 5000);
 
     return () => {
       mounted = false;
-      clearInterval(interval);
+      clearInterval(intervalId);
     };
-  }, []);
+  }, [username]);
 
   if (loading) return <div className="p-4 text-center font-semibold">Scanning for partners...</div>;
 
@@ -100,7 +100,9 @@ export default function ProfilesList() {
             </div>
 
             <div className="flex justify-between items-center">
-              <p className="text-gray-500 mt-3 break-words">{profile.country ? `From ${profile.country}` : "Global"}</p>
+              <p className="text-gray-500 mt-3 break-words">
+                {profile.country ? `From ${profile.country}` : "Global"}
+              </p>
               <span
                 className="flex text-3xl mt-6 cursor-pointer text-[#63372C] hover:scale-110 transition-transform"
                 onClick={(e) => {

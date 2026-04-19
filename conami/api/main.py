@@ -438,6 +438,25 @@ def block_user(
     
     return new_block
 
+# Unblock blocked users route 
+@app.delete("/users/block/{username_typed}")
+def unblock_user(username_typed: Annotated[str, Path(min_length=8, max_length=40)], session: SessionDep, username: Annotated[str, Depends(get_username_from_cookie)]):
+    if username == username_typed:
+        raise HTTPException(status_code=400, detail="You cannot unblock yourself")
+    
+    blocked_row = session.exec(select(BlockedUser).where(
+        BlockedUser.blocker_username == username, BlockedUser.blocked_username == username_typed
+        )
+    ).first()
+    
+    if blocked_row is None:
+        raise HTTPException(status_code=404, detail="User is not blocked")
+
+    session.delete(blocked_row)
+    session.commit()
+
+    return {"message": f"{username_typed} unblocked successfully"}
+
 # Get Blocked Users Route - new db table
 @app.get("/users/blocked")
 def get_blocked_users(
@@ -455,25 +474,113 @@ def get_blocked_users(
 def update_username(
     new_username: Annotated[str, Body(..., embed=True)],
     session: SessionDep,
+    response: Response,
     username: Annotated[str, Depends(get_username_from_cookie)]
 ) -> dict:
-    # Only validate the username
-    check_regexes(username=new_username) 
-    
-    user = session.get(User, username)
-    if user is None:
+    check_regexes(username=new_username)
+
+    old_user = session.get(User, username)
+    if old_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     existing_user = session.get(User, new_username)
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
 
-    user.username = new_username
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+    try:
+        new_user = User(
+            username=new_username,
+            password=old_user.password,
+            email=old_user.email,
+            is_banned=old_user.is_banned,
+        )
+        session.add(new_user)
+        session.commit()
+        session.refresh(new_user)
 
-    return {"ok": True}
+        blocked_as_blocker = session.exec(
+            select(BlockedUser).where(BlockedUser.blocker_username == username)
+        ).all()
+        for row in blocked_as_blocker:
+            row.blocker_username = new_username
+            session.add(row)
+
+        blocked_as_blocked = session.exec(
+            select(BlockedUser).where(BlockedUser.blocked_username == username)
+        ).all()
+        for row in blocked_as_blocked:
+            row.blocked_username = new_username
+            session.add(row)
+
+        reports_as_reporter = session.exec(
+            select(UsersReported).where(UsersReported.reporter_username == username)
+        ).all()
+        for row in reports_as_reporter:
+            row.reporter_username = new_username
+            session.add(row)
+
+        reports_as_reported = session.exec(
+            select(UsersReported).where(UsersReported.reported_username == username)
+        ).all()
+        for row in reports_as_reported:
+            row.reported_username = new_username
+            session.add(row)
+
+        tickets = session.exec(
+            select(SupportTicket).where(SupportTicket.username == username)
+        ).all()
+        for row in tickets:
+            row.username = new_username
+            session.add(row)
+
+        conversations_user1 = session.exec(
+            select(Conversations).where(Conversations.user1 == username)
+        ).all()
+        for row in conversations_user1:
+            row.user1 = new_username
+            session.add(row)
+
+        conversations_user2 = session.exec(
+            select(Conversations).where(Conversations.user2 == username)
+        ).all()
+        for row in conversations_user2:
+            row.user2 = new_username
+            session.add(row)
+
+        messages = session.exec(
+            select(Message).where(Message.sender_username == username)
+        ).all()
+        for row in messages:
+            row.sender_username = new_username
+            session.add(row)
+
+        old_profile = session.get(Profile, username)
+        if old_profile:
+            new_profile = Profile(
+                username=new_username,
+                email=old_profile.email,
+                gender=old_profile.gender,
+                age=old_profile.age,
+                country=old_profile.country,
+                fluent=old_profile.fluent,
+                practice=old_profile.practice,
+                image=old_profile.image,
+            )
+            session.add(new_profile)
+            session.commit()
+            session.refresh(new_profile)
+
+            session.delete(old_profile)
+
+        session.delete(old_user)
+        session.commit()
+
+        set_auth_cookie(response, new_username)
+        return {"ok": True}
+
+    except IntegrityError as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Update Password Route
 @app.put("/users/update-password")

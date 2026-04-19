@@ -3,12 +3,11 @@
 import React, { useState, useEffect } from "react";
 import BottomNav from "../Components/BottomNav.js";
 import Sidebar from "../Components/sidebar.js"
-import { LuUser, LuKeyRound, LuShieldCheck, LuMail, LuTriangleAlert, LuMoon, LuType } from "react-icons/lu";
 import { RiCustomerService2Line } from "react-icons/ri";
-
+import { LuUser, LuKeyRound, LuShieldCheck, LuMail, LuTriangleAlert/*, LuMoon, LuType*/ } from "react-icons/lu";
 
 export default function Settings() {
-    const [activeSection, setActiveSection] = useState("appearance");
+    const [activeSection, setActiveSection] = useState("blocked");
     return (
         <div className="grid grid-cols-12 min-h-screen">
             <div className="hidden md:block md:col-span-3 lg:col-span-2">
@@ -19,11 +18,13 @@ export default function Settings() {
                     <h1 className="text-2xl font-bold">Settings</h1>
                 </div>
                 <ul className="ml-2 flex space-x-4 text-[#63372c]/80 text-base">
+                    {/*
                     <li className="cursor-pointer hover:text-[#63372c]">
                         <button onClick={() => setActiveSection("appearance")}>
                             Appearance
                         </button>
                     </li>
+                    */}
                     <li className="cursor-pointer hover:text-[#63372c]">
                         <button onClick={() => setActiveSection("blocked")}>
                             Blocked Users
@@ -41,7 +42,7 @@ export default function Settings() {
                     </li>
                 </ul>
                 <main className="p-15">
-                    {activeSection === "appearance" && <AppearanceSection />}
+                    {/* {activeSection === "appearance" && <AppearanceSection />} */}
                     {activeSection === "blocked" && <BlockedUsersSection />}
                     {activeSection === "login" && <LoginDetailsSection />}
                     {activeSection === "help" && <HelpCenterSection />}
@@ -52,6 +53,7 @@ export default function Settings() {
     )
 }
 
+/*
 function AppearanceSection() {
     const [darkMode, setDarkMode] = useState(false);
     const [fontSize, setFontSize] = useState("medium");
@@ -116,6 +118,7 @@ function AppearanceSection() {
         </div>
     );
 }
+*/
 
 function BlockedUsersSection() {
     const [blockedUsers, setBlockedUsers] = useState([]);
@@ -176,10 +179,35 @@ function BlockedUsersSection() {
         }
     }
 
+    const UnblockUser = async (blockedUsername) => {
+        try {
+            const res = await fetch(`${API_BASE}/users/block/` + blockedUsername, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to unblock user.");
+                return;
+            }
+
+            setError(null);
+            setBlockedUsers((prev) =>
+                prev.filter((user) => user.blocked_username !== blockedUsername)
+            );
+        } catch (err) {
+            setError("Network error occurred.");
+        }
+    }
+
     return (
         <div>
             <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-                {/* This part will be on the top left of the main part */}
                 <div className="flex flex-col justify-center items-center md:items-start gap-4">
                     <h2 className="text-[2rem] font-semibold leading-tight text-center tracking-tight">Blocked Users List</h2>
                     <p className="text-[1rem] font-normal text-center leading-6">Manage your blocked list to control who can interact with you.</p>
@@ -204,7 +232,6 @@ function BlockedUsersSection() {
             <p className="text-[1rem] font-normal leading-6 mt-5">Total Blocked: {blockedUsers.length} </p>
             {error && <p className="text-red-500 mt-2">{error}</p>}
 
-            {/* This part will be below the top part and will be a list of blocked users */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5 ">
                 {blockedUsers.map((user, index) => (
                     <div
@@ -217,7 +244,10 @@ function BlockedUsersSection() {
                         <p className="text-[1rem] font-normal leading-6 mt-2 italic text-gray-500">
                             Blocked User
                         </p>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none hover:bg-[#4a2921]">
+                        <button
+                            className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none hover:bg-[#4a2921]"
+                            onClick={() => UnblockUser(user.blocked_username)}
+                        >
                             Unblock
                         </button>
                     </div>
@@ -231,21 +261,164 @@ function LoginDetailsSection() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [TimeSetUsername, setTimeSetUsername] = useState(null);
-    const [TimeSetPassword, setTimeSetPassword] = useState(null);
-    const [TimeSetEmail, setTimeSetEmail] = useState(null);
-    const [twofa, settwofa] = useState(false);
+    const [TimeSetUsername, setTimeSetUsername] = useState("Loading...");
+    const [TimeSetPassword, setTimeSetPassword] = useState("Recently updated");
+    const [TimeSetEmail, setTimeSetEmail] = useState("Loading...");
+    const [openModal, setOpenModal] = useState(null);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
+
+    useEffect(() => {
+        const loadLoginDetails = async () => {
+            try {
+                const [meRes, profileRes] = await Promise.all([
+                    fetch(`${API_BASE}/auth/me`, {
+                        method: "GET",
+                        credentials: "include",
+                    }),
+                    fetch(`${API_BASE}/profile`, {
+                        method: "GET",
+                        credentials: "include",
+                    }),
+                ]);
+
+                if (meRes.ok) {
+                    const meData = await meRes.json();
+                    setTimeSetUsername(meData.username || "No username found");
+                } else {
+                    setTimeSetUsername("No username found");
+                }
+
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json();
+                    setTimeSetEmail(profileData.email || "No email set");
+                } else {
+                    setTimeSetEmail("No email set");
+                }
+            } catch (err) {
+                setTimeSetUsername("Unable to load");
+                setTimeSetEmail("Unable to load");
+            }
+        };
+
+        loadLoginDetails();
+    }, [API_BASE]);
+
+    const closeModal = () => {
+        setOpenModal(null);
+        setUsername("");
+        setPassword("");
+        setEmail("");
+        setError(null);
+        setSuccessMessage(null);
+    };
+
+    const handleUpdateUsername = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/users/update-username`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ new_username: username }),
+            });
+
+            const rawText = await res.text();
+
+            let data = {};
+            try {
+                data = JSON.parse(rawText);
+            } catch { }
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to update username.");
+                setSuccessMessage(null);
+                return;
+            }
+
+            setTimeSetUsername(username);
+            setSuccessMessage("Username updated successfully.");
+            setError(null);
+            closeModal();
+        } catch (err) {
+            setError("Network error occurred.");
+            setSuccessMessage(null);
+        }
+    };
+
+    const handleUpdatePassword = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/users/update-password`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ new_password: password }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to update password.");
+                setSuccessMessage(null);
+                return;
+            }
+
+            setTimeSetPassword("Password updated");
+            setSuccessMessage("Password updated successfully.");
+            setError(null);
+            closeModal();
+        } catch (err) {
+            setError("Network error occurred.");
+            setSuccessMessage(null);
+        }
+    };
+
+    const handleUpdateEmail = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/users/update-email`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({ new_email: email }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.detail || "Failed to update email.");
+                setSuccessMessage(null);
+                return;
+            }
+
+            setTimeSetEmail(email);
+            setSuccessMessage("Email updated successfully.");
+            setError(null);
+            closeModal();
+        } catch (err) {
+            setError("Network error occurred.");
+            setSuccessMessage(null);
+        }
+    };
 
     return (
         <div>
             <div className="flex flex-col justify-center items-center md:items-start">
-                {/* This part will be on the top left of the main part */}
                 <div>
                     <h2 className="text-[2rem] font-semibold leading-tight tracking-tight text-center md:text-start">Login Details Management</h2>
                     <p className="text-[1rem] font-normal leading-6 text-center md:text-start">Update and manage your primary account security settings</p>
                 </div>
-                <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 justify-items-center w-full gap-5">
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
+
+                {error && <p className="text-red-600 font-medium mt-4">{error}</p>}
+                {successMessage && <p className="text-green-600 font-medium mt-4">{successMessage}</p>}
+
+                <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 justify-items-stretch w-full gap-5">
+                    <div className="flex flex-col justify-between bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 w-60 h-50">
                         <div className="flex justify-start items-center gap-4">
                             <LuUser className="text-[#63372c]" size={50} />
                             <div>
@@ -253,10 +426,19 @@ function LoginDetailsSection() {
                                 <p className="text-[1rem] font-normal leading-6">Info: {TimeSetUsername}</p>
                             </div>
                         </div>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Username</button>
+                        <button
+                            className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none self-start mt-2"
+                            onClick={() => {
+                                setOpenModal("username");
+                                setError(null);
+                                setSuccessMessage(null);
+                            }}
+                        >
+                            Change Username
+                        </button>
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
+                    <div className="flex flex-col justify-between bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 w-60 h-50">
                         <div className="flex justify-start items-center gap-4">
                             <LuKeyRound className="text-[#63372c]" size={50} />
                             <div>
@@ -264,10 +446,19 @@ function LoginDetailsSection() {
                                 <p className="text-[1rem] font-normal leading-6">Info: {TimeSetPassword}</p>
                             </div>
                         </div>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Update Password</button>
+                        <button
+                            className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none self-start mt-2"
+                            onClick={() => {
+                                setOpenModal("password");
+                                setError(null);
+                                setSuccessMessage(null);
+                            }}
+                        >
+                            Update Password
+                        </button>
                     </div>
 
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
+                    <div className="flex flex-col justify-between bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 w-60 h-50">
                         <div className="flex justify-start items-center gap-4">
                             <LuMail className="text-[#63372c]" size={50} />
                             <div>
@@ -275,23 +466,110 @@ function LoginDetailsSection() {
                                 <p className="text-[1rem] font-normal leading-6">Info: {TimeSetEmail}</p>
                             </div>
                         </div>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">Change Email</button>
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
-                        <div className="flex justify-start items-center gap-4">
-                            <LuShieldCheck className="text-[#63372c]" size={50} />
-                            <div>
-                                <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">2FA</h3>
-                                <p className="text-[1rem] font-normal leading-6">Info: {twofa ? "Enabled" : "Disabled"}</p>
-                            </div>
-                        </div>
-                        <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">
-                            Manage 2FA
+                        <button
+                            className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none self-start mt-2"
+                            onClick={() => {
+                                setOpenModal("email");
+                                setError(null);
+                                setSuccessMessage(null);
+                            }}
+                        >
+                            Change Email
                         </button>
                     </div>
+
+                    {/*
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center bg-white/70 border-2 border-[#63372c] rounded-md px-4 py-3 gap-4 w-full min-h-25">
+                <div className="flex justify-start items-center gap-4">
+                    <LuShieldCheck className="text-[#63372c]" size={50} />
+                    <div>
+                        <h3 className="text-[1.5rem] font-medium leading-tight tracking-tight">2FA</h3>
+                        <p className="text-[1rem] font-normal leading-6">Info: Disabled</p>
+                    </div>
+                </div>
+                <button className="w-40 h-9 px-4 py-2.5 bg-[#63372c] text-white rounded-md text-sm font-medium leading-none">
+                    Manage 2FA
+                </button>
+            </div>
+            */}
                 </div>
             </div>
+
+            {openModal && (
+                <div
+                    className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50"
+                    onClick={closeModal}
+                >
+                    <div
+                        className="relative bg-white rounded-2xl shadow-xl w-[420px] max-w-[90%] p-6"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            className="absolute top-4 right-4 text-gray-500 cursor-pointer text-xl font-bold"
+                            onClick={closeModal}
+                        >
+                            ✕
+                        </button>
+
+                        {openModal === "username" && (
+                            <>
+                                <h3 className="text-2xl font-semibold text-[#63372c] mb-4">Change Username</h3>
+                                <input
+                                    type="text"
+                                    placeholder="Enter new username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="w-full rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal"
+                                />
+                                <button
+                                    className="mt-4 w-full bg-[#63372c] text-white rounded-md text-sm font-medium py-3"
+                                    onClick={handleUpdateUsername}
+                                >
+                                    Save Username
+                                </button>
+                            </>
+                        )}
+
+                        {openModal === "password" && (
+                            <>
+                                <h3 className="text-2xl font-semibold text-[#63372c] mb-4">Update Password</h3>
+                                <input
+                                    type="password"
+                                    placeholder="Enter new password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal"
+                                />
+                                <button
+                                    className="mt-4 w-full bg-[#63372c] text-white rounded-md text-sm font-medium py-3"
+                                    onClick={handleUpdatePassword}
+                                >
+                                    Save Password
+                                </button>
+                            </>
+                        )}
+
+                        {openModal === "email" && (
+                            <>
+                                <h3 className="text-2xl font-semibold text-[#63372c] mb-4">Change Email</h3>
+                                <input
+                                    type="email"
+                                    placeholder="Enter new email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full rounded-md px-4 py-3 bg-white/70 border-2 border-[#63372c] text-sm font-normal"
+                                />
+                                <button
+                                    className="mt-4 w-full bg-[#63372c] text-white rounded-md text-sm font-medium py-3"
+                                    onClick={handleUpdateEmail}
+                                >
+                                    Save Email
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
