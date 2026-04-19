@@ -1,8 +1,23 @@
+"use client";
+
 import Image from "next/image";
 import Logo from "./Components/Logo";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./Components/AuthContext";
 
 export default function FrontPage() {
+    const router = useRouter();
+    const { username } = useAuth();
+    useEffect(() => {
+        if (username){
+            router.replace("/Home");
+        }
+    }, [username]);
+
+    if (username) return null;
+    
     return (
         <div className="relative grid min-h-screen lg:grid-cols-2 bg-[#f0e1d1]">
             <div className="absolute top-8 left-1/2 -translate-x-1/2 lg:left-8 lg:translate-x-0">
