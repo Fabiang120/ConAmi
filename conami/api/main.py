@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from jose import JWTError, jwt
 from sqlalchemy.exc import IntegrityError
 from dotenv import load_dotenv

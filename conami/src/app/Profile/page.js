@@ -12,29 +12,38 @@ export default function Profile() {
     const [gender, setGender] = useState("");
     const [age, setAge] = useState("");
     const [LanguageSpoken, setLanguageSpoken] = useState("");
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
     const router = useRouter();
     const handleSave = async () => {
-        console.log("SAVE CLICKED");
-        const res = await fetch("api/profile", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-                email: email,
-                practice: language,
-                age: age,
-                country: country,
-                gender: gender,
-                fluent: LanguageSpoken
-            }),
-        });
-        if(!res.ok){
-            console.error("Failed to save profile");
+        try{
+            console.log("SAVE CLICKED");
+            const payload = {
+                email: email?.trim() || null,
+                fluent: LanguageSpoken || null,
+                country: country || null,
+                gender: gender || null,
+                practice: language || null,
+                age: age === "" || age == null ? null : Number(age),
+            };
+            
+            console.log("PAYLOAD: ", payload);
+
+            const res = await fetch(`${API_BASE}/profile`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify(payload),
+            });
+            if(!res.ok){
+                throw new Error("Failed to save profile");
+            }
+            router.push("/Home");
+        } catch (err) {
+            console.error(err);
         }
-        router.push("/Home");
     }
     
     return (
