@@ -21,6 +21,11 @@ export function ProfileModal({ profile, onClose }) {
       console.error("Error starting conversation:", err);
     }
   };
+
+  const UppercaseVar = (str) => {
+    if (!str) return "-";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50"
@@ -37,29 +42,43 @@ export function ProfileModal({ profile, onClose }) {
 
         <div className="bg-[#63372C] h-32"></div>
 
+      
         <div className="flex justify-center">
-          <div className="w-28 h-28 bg-white rounded-full -mt-14 border-4 border-white shadow-md"></div>
+        <div className="w-28 h-28 bg-white rounded-full -mt-14 border-4 border-white shadow-md overflow-hidden flex items-center justify-center">
+          {profile.image ? (
+            <img
+              src={profile.image}
+              alt={profile.username}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-4xl">
+              {profile.username?.charAt(0)?.toUpperCase()}
+            </div>
+          )}
+        </div>
+
         </div>
 
         <div className="text-center mt-3 space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">{profile.username}</h1>
           <p className="text-gray-400 text-sm">{profile.email}</p>
-          <p className="text-gray-500 text-sm">{profile.gender} • {profile.age} yrs</p>
+          <p className="text-gray-500 text-sm">{UppercaseVar(profile.gender)} • {profile.age} yrs</p>
         </div>
 
         <div className="flex justify-between items-stretch mt-8 px-8 text-center">
           <div className="flex flex-col items-center justify-center gap-1">
-            <p className="text-lg font-semibold">{profile.fluent}</p>
+            <p className="text-lg font-semibold">{UppercaseVar(profile.fluent)}</p>
             <p className="text-xs text-gray-400 tracking-wide">FLUENT IN</p>
           </div>
           <div className="w-[2px] bg-gray-200 self-stretch"></div>
           <div className="flex flex-col items-center justify-center gap-1">
-            <p className="text-lg font-semibold">{profile.practice}</p>
+            <p className="text-lg font-semibold">{UppercaseVar(profile.practice)}</p>
             <p className="text-xs text-gray-400 tracking-wide">PRACTICING</p>
           </div>
           <div className="w-[2px] bg-gray-200 self-stretch"></div>
           <div className="flex flex-col items-center justify-center gap-1">
-            <p className="text-lg font-semibold">{profile.country}</p>
+            <p className="text-lg font-semibold">{UppercaseVar(profile.country)}</p>
             <p className="text-xs text-gray-400 tracking-wide">COUNTRY</p>
           </div>
         </div>

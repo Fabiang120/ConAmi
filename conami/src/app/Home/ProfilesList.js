@@ -13,6 +13,11 @@ export default function ProfilesList() {
   const router = useRouter();
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
+  const UppercaseVar = (str) => {
+    if (!str) return "-";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   const startConversation = async (profileUsername) => {
     try {
       const res = await fetch(`${API_BASE}/conversations`, {
@@ -77,7 +82,19 @@ export default function ProfilesList() {
             className="bg-white rounded-3xl shadow-lg p-6 min-w-0 hover:shadow-2xl transition flex flex-col justify-between cursor-pointer overflow-hidden"
           >
             <div className="flex gap-3">
-              <div className="w-10 h-10 bg-[#63372C] rounded-full flex-shrink-0"></div>
+              <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden bg-[#63372C] flex items-center justify-center">
+                {profile.image ? (
+                  <img
+                  src={profile.image}
+                  alt={profile.username}
+                  className="w-full h-full object-cover"
+                />
+                ) : (
+                  <span className="text-white text-sm font-semibold">
+                    {profile.username?.charAt(0)?.toUpperCase()}
+                  </span>
+                )}
+              </div>
               <div className="flex flex-col min-w-0">
                 <div className="flex items-baseline gap-8">
                   <span className="text-2xl font-semibold break-words">{profile.username}</span>
@@ -91,17 +108,17 @@ export default function ProfilesList() {
             <div className="flex items-center gap-10 mt-5 min-w-0">
               <div className="text-gray-600 mb-1 whitespace-normal min-w-0">
                 <p className="text-xs text-gray-400 uppercase tracking-wider">Fluent</p>
-                <p className="break-words">{profile.fluent || "—"}</p>
+                <p className="break-words">{UppercaseVar(profile.fluent) || "—"}</p>
               </div>
               <div className="text-gray-600 mb-1 whitespace-normal min-w-0">
                 <p className="text-xs text-gray-400 uppercase tracking-wider">Practice</p>
-                <p className="break-words">{profile.practice || "—"}</p>
+                <p className="break-words">{UppercaseVar(profile.practice) || "—"}</p>
               </div>
             </div>
 
             <div className="flex justify-between items-center">
               <p className="text-gray-500 mt-3 break-words">
-                {profile.country ? `From ${profile.country}` : "Global"}
+                {UppercaseVar(profile.country) ? `From ${UppercaseVar(profile.country)}` : "Global"}
               </p>
               <span
                 className="flex text-3xl mt-6 cursor-pointer text-[#63372C] hover:scale-110 transition-transform"
