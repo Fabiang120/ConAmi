@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Field, Session, SQLModel, create_engine, select
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from jose import JWTError, jwt
 from sqlalchemy.exc import IntegrityError
 from dotenv import load_dotenv
@@ -69,14 +69,14 @@ class UsersReported(SQLModel, table=True):
     reporter_username: str = Field(foreign_key="user.username")
     reported_username: str = Field(foreign_key="user.username")
     reason: str
-    created_at : datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class SupportTicket(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(foreign_key="user.username")
     message: str
     is_resolved: bool = Field(default=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Profile(SQLModel, table=True):
     username: str = Field(primary_key=True, foreign_key="user.username")
@@ -101,14 +101,14 @@ class Conversations(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user1: str = Field(foreign_key="user.username")
     user2: str = Field(foreign_key="user.username")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Message(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     conversation_id: int = Field(foreign_key="conversations.id")
     sender_username: str = Field(foreign_key="user.username")
     content: str = Field()
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # This is not a sql table it just combines conversations with their messages
 class ConversationWithMessages(SQLModel):
